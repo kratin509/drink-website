@@ -29,7 +29,14 @@ function Card({ d }) {
   return (
     <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}
       className="relative flex flex-col cursor-default"
-      style={{ padding: '20px 20px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)', transformStyle: 'preserve-3d' }}>
+      style={{
+        padding: '20px 20px 16px',
+        background: 'rgba(10,10,10,0.55)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        border: '1px solid rgba(255,255,255,0.10)',
+        transformStyle: 'preserve-3d',
+      }}>
       {/* Corner accent */}
       <div className="absolute top-0 right-0 w-4 h-4"
         style={{ background: d.a, clipPath: 'polygon(100% 0,0 0,100% 100%)' }} />
@@ -84,13 +91,27 @@ export default function SocialProofSection() {
   }, [])
 
   return (
-    <section id="social" ref={sectionRef} className="section-frame relative z-[41]" style={{ background: 'var(--dark)' }}>
+    <section id="social" ref={sectionRef} className="section-frame relative z-[41]"
+      style={{ background: 'transparent' }}>
+
+      {/* Dark translucent layer — lets the 3D can bleed through */}
+      <div className="absolute inset-0" style={{
+        background: 'linear-gradient(135deg, rgba(4,4,4,0.82) 0%, rgba(8,8,8,0.72) 60%, rgba(0,0,0,0.55) 100%)',
+        backdropFilter: 'blur(2px)',
+        WebkitBackdropFilter: 'blur(2px)',
+      }} />
+
+      {/* Accent glow from active flavor bleeds in from right */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: `radial-gradient(ellipse 55% 70% at 88% 50%, rgba(${activeFlavor.accentRgb},0.12) 0%, transparent 70%)`,
+        transition: 'background 0.6s',
+      }} />
 
       {/* Ghost word */}
       <div ref={bgRef} aria-hidden="true"
         className="absolute inset-0 z-10 flex items-center overflow-hidden pointer-events-none select-none"
         style={{ paddingLeft: '5vw' }}>
-        <span className="vp-word text-white" style={{ fontSize: 'clamp(6rem, 18vw, 24rem)', opacity: 0.018 }}>
+        <span className="vp-word text-white" style={{ fontSize: 'clamp(6rem, 18vw, 24rem)', opacity: 0.025 }}>
           COMMUNITY
         </span>
       </div>
