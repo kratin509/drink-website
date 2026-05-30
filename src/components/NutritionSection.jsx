@@ -6,174 +6,126 @@ import { useFlavorStore } from '../store/flavorStore'
 gsap.registerPlugin(ScrollTrigger)
 
 const CALLOUTS = [
-  { key: 'protein',  label: 'Protein',   unit: '' },
-  { key: 'caffeine', label: 'Caffeine',  unit: '' },
-  { key: 'calories', label: 'Calories',  unit: 'kcal' },
-  { key: 'sodium',   label: 'Sodium',    unit: '' },
-]
-
-const NUT_ROWS = [
-  { label: 'Total Fat',           sub: false, key: null,      fixed: '0g' },
-  { label: 'Saturated Fat',       sub: true,  key: null,      fixed: '0g' },
-  { label: 'Trans Fat',           sub: true,  key: null,      fixed: '0g' },
-  { label: 'Sodium',              sub: false, key: 'sodium',  fixed: null },
-  { label: 'Total Carbohydrate',  sub: false, key: null,      fixed: '3g' },
-  { label: 'Total Sugars',        sub: true,  key: 'sugar',   fixed: null },
+  { key: 'protein',  label: 'Protein' },
+  { key: 'caffeine', label: 'Caffeine' },
+  { key: 'calories', label: 'Calories' },
+  { key: 'sodium',   label: 'Sodium' },
 ]
 
 export default function NutritionSection() {
-  const sectionRef   = useRef()
-  const bgWordRef    = useRef()
-  const panelRef     = useRef()
-  const calloutsRef  = useRef([])
+  const sectionRef  = useRef()
+  const bgRef       = useRef()
+  const panelRef    = useRef()
+  const rightRef    = useRef()
   const { activeFlavor } = useFlavorStore()
   const n = activeFlavor.nutrition
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to(bgWordRef.current, {
-        yPercent: -14,
-        ease: 'none',
+      gsap.to(bgRef.current, {
+        yPercent: -16, ease: 'none',
         scrollTrigger: { trigger: sectionRef.current, start: 'top bottom', end: 'bottom top', scrub: true },
       })
       gsap.fromTo(panelRef.current,
-        { opacity: 0, x: -50 },
+        { opacity: 0, x: -44 },
         { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 72%' } }
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 74%' } }
       )
-      gsap.fromTo(calloutsRef.current.filter(Boolean),
-        { opacity: 0, x: 45 },
-        { opacity: 1, x: 0, duration: 0.7, stagger: 0.09, ease: 'power3.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 62%' } }
+      gsap.fromTo(rightRef.current?.children ? Array.from(rightRef.current.children) : [],
+        { opacity: 0, x: 38 },
+        { opacity: 1, x: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 64%' } }
       )
     }, sectionRef)
     return () => ctx.revert()
   }, [activeFlavor])
 
   return (
-    <section
-      id="nutrition"
-      ref={sectionRef}
-      className="relative py-28 overflow-hidden"
-      style={{ background: '#f8f8f6' }}
-    >
-      {/* Bg word */}
-      <div
-        ref={bgWordRef}
-        aria-hidden="true"
-        className="absolute inset-0 flex items-center justify-end pointer-events-none select-none overflow-hidden"
-      >
-        <span
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 900,
-            fontSize: 'clamp(7rem, 22vw, 28rem)',
-            lineHeight: 0.82,
-            letterSpacing: '-0.04em',
-            color: `rgba(${activeFlavor.accentRgb}, 0.06)`,
-            transition: 'color 0.5s',
-            whiteSpace: 'nowrap',
-            paddingRight: '4vw',
-          }}
-        >
+    <section id="nutrition" ref={sectionRef} className="section-frame" style={{ background: 'var(--page-bg)' }}>
+
+      {/* ── z-10: bg word ───────────────────────────────────────────────── */}
+      <div ref={bgRef} aria-hidden="true"
+        className="absolute inset-0 z-10 flex items-center justify-end overflow-hidden select-none pointer-events-none pr-[4vw]">
+        <span className="vp-word" style={{
+          fontSize: 'clamp(6rem, 20vw, 26rem)',
+          color: `rgba(${activeFlavor.accentRgb}, 0.07)`,
+          transition: 'color 0.5s',
+        }}>
           FACTS
         </span>
       </div>
 
-      <div className="relative z-10 px-8 md:px-16 lg:px-24">
+      {/* ── z-20: UI ────────────────────────────────────────────────────── */}
+      <div className="absolute inset-0 z-20 flex flex-col px-8 md:px-16 lg:px-24 pt-10 pb-8">
+
         {/* Label */}
-        <div className="flex items-center gap-4 mb-12">
+        <div className="flex items-center gap-3 mb-6">
           <div className="h-px w-8" style={{ background: activeFlavor.accent, transition: 'background 0.4s' }} />
-          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.28em', textTransform: 'uppercase', opacity: 0.45 }}>
-            03 / What's Inside
-          </span>
+          <span className="label-tag" style={{ opacity: 0.45 }}>03 / What's Inside</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        {/* Two-column content fills remaining height */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 flex-1 min-h-0 items-start">
 
-          {/* Left: headline + panel */}
-          <div ref={panelRef}>
-            <h2 style={{
-              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900,
-              fontSize: 'clamp(3.5rem, 7vw, 8rem)', lineHeight: 0.85,
-              letterSpacing: '-0.03em', textTransform: 'uppercase', marginBottom: '2.5rem',
-            }}>
+          {/* Left: headline + FDA panel */}
+          <div ref={panelRef} className="flex flex-col gap-5 min-h-0">
+            <h2 className="headline" style={{ fontSize: 'clamp(2.8rem, 6vw, 7rem)' }}>
               <span style={{ color: '#0a0a0a' }}>Nutrition</span>
               <br />
               <span style={{ color: activeFlavor.accent, transition: 'color 0.4s' }}>Facts</span>
             </h2>
 
-            {/* FDA-style panel */}
-            <div style={{ border: '3px solid #0a0a0a', padding: '20px 24px', background: '#fff', maxWidth: '400px' }}>
-              <div style={{ borderBottom: '8px solid #0a0a0a', paddingBottom: '8px', marginBottom: '8px' }}>
-                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '2.5rem', lineHeight: 1 }}>
+            {/* FDA-style panel — compact */}
+            <div style={{ border: '3px solid #0a0a0a', padding: '16px 20px', background: '#fff', maxWidth: '380px' }}>
+              <div style={{ borderBottom: '8px solid #0a0a0a', paddingBottom: '6px', marginBottom: '6px' }}>
+                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '2.1rem', lineHeight: 1 }}>
                   Nutrition Facts
                 </p>
-                <p style={{ fontSize: '0.82rem', opacity: 0.55, marginTop: '4px' }}>Serving Size 1 can (355 mL)</p>
+                <p style={{ fontSize: '0.78rem', opacity: 0.55, marginTop: '3px' }}>Serving Size 1 can (355 mL)</p>
               </div>
 
-              {/* Calories hero row */}
-              <div className="flex justify-between items-baseline py-2" style={{ borderTop: '8px solid #0a0a0a' }}>
-                <span style={{ fontWeight: 700 }}>Calories</span>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '2.5rem', lineHeight: 1 }}>{n.calories}</span>
+              {/* Calories */}
+              <div className="nut-row" style={{ borderTop: '8px solid #0a0a0a', paddingTop: '4px' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.88rem' }}>Calories</span>
+                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '2.1rem', lineHeight: 1 }}>{n.calories}</span>
               </div>
 
-              {NUT_ROWS.map(({ label, sub, key, fixed }) => (
-                <div key={label} className="flex justify-between items-baseline py-1.5"
-                  style={{ borderTop: '1px solid rgba(0,0,0,0.1)', paddingLeft: sub ? '16px' : '0' }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: sub ? 400 : 600 }}>{label}</span>
-                  <span style={{ fontSize: '0.85rem' }}>{key ? n[key] : fixed}</span>
+              {[
+                ['Total Fat', '0g'], ['Saturated Fat', '0g', true], ['Sodium', n.sodium],
+                ['Total Carbohydrate', '3g'], ['Total Sugars', n.sugar, true],
+              ].map(([label, val, sub]) => (
+                <div key={label} className="nut-row" style={{ paddingLeft: sub ? '12px' : 0 }}>
+                  <span style={{ fontWeight: sub ? 400 : 600, fontSize: '0.8rem' }}>{label}</span>
+                  <span style={{ fontSize: '0.8rem' }}>{val}</span>
                 </div>
               ))}
 
-              {/* Highlighted protein + caffeine */}
-              {[
-                { label: 'Protein',  key: 'protein' },
-                { label: 'Caffeine', key: 'caffeine' },
-              ].map(({ label, key }) => (
-                <div key={key} className="flex justify-between items-baseline py-2"
-                  style={{ borderTop: `3px solid ${activeFlavor.accent}`, transition: 'border-color 0.4s' }}>
-                  <span style={{ fontWeight: 700, color: activeFlavor.accent, fontSize: '0.9rem', transition: 'color 0.4s' }}>{label}</span>
-                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.3rem', lineHeight: 1, color: activeFlavor.accent, transition: 'color 0.4s' }}>{n[key]}</span>
+              {[['Protein', n.protein], ['Caffeine', n.caffeine]].map(([l, v]) => (
+                <div key={l} className="nut-row" style={{ borderTop: `3px solid ${activeFlavor.accent}`, transition: 'border-color 0.4s' }}>
+                  <span style={{ fontWeight: 700, color: activeFlavor.accent, fontSize: '0.85rem', transition: 'color 0.4s' }}>{l}</span>
+                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.2rem', lineHeight: 1, color: activeFlavor.accent, transition: 'color 0.4s' }}>{v}</span>
                 </div>
               ))}
             </div>
 
-            <p style={{ fontSize: '0.72rem', opacity: 0.3, marginTop: '16px', maxWidth: '360px', lineHeight: 1.6 }}>
-              * Not recommended for children, pregnant women, or caffeine-sensitive individuals.
+            <p style={{ fontSize: '0.68rem', opacity: 0.28, maxWidth: '340px', lineHeight: 1.6 }}>
+              * Not recommended for children or caffeine-sensitive individuals.
             </p>
           </div>
 
-          {/* Right: callout numbers */}
-          <div className="flex flex-col gap-4 pt-4 lg:pt-20">
-            {CALLOUTS.map((c, i) => (
-              <div
-                key={c.key}
-                ref={el => (calloutsRef.current[i] = el)}
-                className="flex items-stretch gap-5 bg-white"
-                style={{ padding: '22px 26px', border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
-              >
-                <div className="w-1 flex-shrink-0 self-stretch" style={{ background: activeFlavor.accent, transition: 'background 0.4s', minHeight: '44px' }} />
+          {/* Right: big callout numbers — data cards */}
+          <div ref={rightRef} className="grid grid-cols-2 gap-4 content-start">
+            {CALLOUTS.map(c => (
+              <div key={c.key} className="flex items-stretch gap-4 bg-white"
+                style={{ padding: '18px 22px', border: '1px solid rgba(0,0,0,0.07)', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
+                <div className="w-0.5 flex-shrink-0 self-stretch"
+                  style={{ background: activeFlavor.accent, transition: 'background 0.4s', minHeight: '40px' }} />
                 <div>
-                  <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 900,
-                    fontSize: 'clamp(2.5rem, 4vw, 4.5rem)',
-                    lineHeight: 0.9,
-                    color: activeFlavor.accent,
-                    transition: 'color 0.4s',
-                  }}>
-                    {n[c.key]}{c.unit && <span style={{ fontSize: '0.45em', opacity: 0.6 }}> {c.unit}</span>}
+                  <div className="headline"
+                    style={{ fontSize: 'clamp(2rem, 3.5vw, 3.8rem)', color: activeFlavor.accent, transition: 'color 0.4s' }}>
+                    {n[c.key]}
                   </div>
-                  <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 700,
-                    fontSize: '0.68rem',
-                    letterSpacing: '0.22em',
-                    textTransform: 'uppercase',
-                    opacity: 0.4,
-                    marginTop: '6px',
-                  }}>
+                  <div className="label-tag" style={{ opacity: 0.4, marginTop: '4px', fontSize: '0.62rem' }}>
                     {c.label} per can
                   </div>
                 </div>

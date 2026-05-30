@@ -9,6 +9,7 @@ import FlavorSection      from './components/FlavorSection'
 import NutritionSection   from './components/NutritionSection'
 import SocialProofSection from './components/SocialProofSection'
 import FooterSection      from './components/FooterSection'
+import PortfolioSection   from './components/PortfolioSection'
 import WebGLCanvas        from './components/WebGLCanvas'
 import { useLenis }       from './hooks/useLenis'
 import { useFlavorStore } from './store/flavorStore'
@@ -18,7 +19,7 @@ gsap.registerPlugin(ScrollTrigger)
 // ── Scroll provider — wires up ScrollTrigger after DOM exists ───────────────
 function ScrollProvider({ children, onScrollChange }) {
   useEffect(() => {
-    const sectionIds = ['#hero', '#flavors', '#nutrition', '#cta']
+    const sectionIds = ['#hero', '#flavors', '#nutrition', '#portfolio', '#cta']
     const els = sectionIds.map(s => document.querySelector(s)).filter(Boolean)
     if (!els.length) return
 
@@ -73,6 +74,7 @@ function MainApp() {
         <FlavorSection />
         <NutritionSection />
         <SocialProofSection />
+        <PortfolioSection />
         <FooterSection />
       </main>
     </div>

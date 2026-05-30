@@ -1,103 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+/* ── Design tokens ──────────────────────────────────────────────────────── */
 :root {
-  --accent: #dc2626;
-  --accent-rgb: 220, 38, 38;
+  --accent:       #dc2626;
+  --accent-rgb:   220, 38, 38;
+  --page-bg:      #f2f1ef;
+  --dark:         #080808;
+  --canvas-z:     40;   /* WebGL canvas always above sections */
+  --nav-z:        60;   /* Navbar above canvas */
+  --loader-z:     9999; /* Preloader topmost */
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  scroll-behavior: auto;
-}
+html { scroll-behavior: auto; overflow-x: hidden; }
 
 body {
   font-family: 'Barlow', sans-serif;
-  background: #f8f8f6;
-  color: #0a0a0a;
+  background: var(--page-bg);
+  color: var(--dark);
   overflow-x: hidden;
 }
 
+/* Root is a clean pass-through — no border / centering constraints */
 #root {
   width: 100%;
   max-width: 100%;
   margin: 0;
   text-align: left;
   border: none;
-  min-height: auto;
   display: block;
 }
 
-.font-display {
-  font-family: 'Barlow Condensed', sans-serif;
+/* ── Z-index blueprint (utility classes) ──────────────────────────────── */
+/* z-0  → page background                                                   */
+/* z-10 → bg typography canvas layer (absolute within section)             */
+/* z-20 → UI blocks: cards, copy, buttons                                   */
+/* z-40 → WebGL canvas (fixed, pointer-events: none)                       */
+/* z-50 → Navbar                                                             */
+/* z-[9999] → Preloader overlay                                              */
+
+/* ── Section constraint — all main sections are full-viewport locked ─── */
+.section-frame {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
 }
 
-.accent-color {
-  color: var(--accent);
-}
-
-.accent-bg {
-  background-color: var(--accent);
-}
-
-/* Fluid headline that fills viewport width */
-.headline-fill {
+/* ── Typography system ──────────────────────────────────────────────────── */
+.vp-word {
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 0.9;
-  font-size: clamp(4rem, 12vw, 12rem);
-  letter-spacing: -0.02em;
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
 }
 
-/* Ticker tape */
-@keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.ticker-inner {
-  animation: ticker 18s linear infinite;
-}
-
-/* Floating ingredient blobs */
-@keyframes floatY {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50%       { transform: translateY(-24px) rotate(8deg); }
-}
-.float-anim {
-  animation: floatY 4s ease-in-out infinite;
+.headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
 }
 
-/* Pulse ring */
-@keyframes pulseRing {
-  0%   { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.8); opacity: 0; }
-}
-.pulse-ring::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 2px solid var(--accent);
-  animation: pulseRing 2s ease-out infinite;
+.label-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
 }
 
-/* Social card tilt on hover */
-.social-card {
-  transition: transform 0.3s ease;
-  transform-style: preserve-3d;
-}
-.social-card:hover {
-  transform: perspective(800px) rotateX(-4deg) rotateY(6deg) scale(1.04);
-}
-
-/* CTA button */
+/* ── CTA buttons ────────────────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -106,74 +87,60 @@ body {
   color: #fff;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.88rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 14px 36px;
+  padding: 13px 28px;
   border: none;
   cursor: pointer;
+  text-decoration: none;
   transition: background 0.2s, transform 0.15s;
 }
-.btn-primary:hover {
-  background: #0a0a0a;
-  transform: translateY(-2px);
-}
+.btn-primary:hover { background: var(--dark); transform: translateY(-2px); }
 
 .btn-outline {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   background: transparent;
-  color: #0a0a0a;
+  color: var(--dark);
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.88rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 13px 36px;
-  border: 2px solid #0a0a0a;
+  padding: 11px 28px;
+  border: 2px solid var(--dark);
   cursor: pointer;
+  text-decoration: none;
   transition: background 0.2s, color 0.2s, transform 0.15s;
 }
-.btn-outline:hover {
-  background: #0a0a0a;
-  color: #fff;
-  transform: translateY(-2px);
-}
+.btn-outline:hover { background: var(--dark); color: #fff; transform: translateY(-2px); }
 
-/* Nutrition label strip */
-.nutrition-row {
-  border-top: 1px solid rgba(0,0,0,0.1);
+/* ── Ticker tape ────────────────────────────────────────────────────────── */
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.ticker-inner { animation: ticker 20s linear infinite; }
+
+/* ── Nutrition label rows ───────────────────────────────────────────────── */
+.nut-row {
   display: flex;
   justify-content: space-between;
-  padding: 6px 0;
-  font-size: 0.85rem;
-}
-.nutrition-row.thick {
-  border-top: 8px solid #0a0a0a;
-  font-weight: 700;
+  align-items: baseline;
+  padding: 5px 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.82rem;
 }
 
-/* Callout line from 3D to 2D */
-.callout-line {
-  position: absolute;
-  width: 60px;
-  height: 1px;
-  background: var(--accent);
+/* ── Portfolio card hover ───────────────────────────────────────────────── */
+.proj-card {
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.proj-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
 }
 
-/* Liquid pour */
-@keyframes pourDrop {
-  0%   { transform: scaleY(0); opacity: 0; }
-  30%  { opacity: 1; }
-  100% { transform: scaleY(1); opacity: 1; }
-}
-.pour-stream {
-  transform-origin: top center;
-  animation: pourDrop 1s ease forwards;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #f8f8f6; }
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--page-bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent); }
