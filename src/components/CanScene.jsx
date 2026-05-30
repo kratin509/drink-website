@@ -69,13 +69,12 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1.38, 0.04))
     }
 
-    /* Section 3 — Social proof: same pose as CTA entry (can stays right) */
-    /* Section 4 — CTA: pour tilt */
+    /* Section 3+ — CTA: far right, upright, pour from top */
     if (section >= 3) {
-      main.position.x  = THREE.MathUtils.lerp(main.position.x, 1.6,   0.05)
-      main.position.y  = THREE.MathUtils.lerp(main.position.y, 0.2,   0.05)
-      main.rotation.x  = THREE.MathUtils.lerp(main.rotation.x, -0.42, 0.04)
-      main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1.06, 0.04))
+      main.position.x  = THREE.MathUtils.lerp(main.position.x, 2.6,  0.05)
+      main.position.y  = THREE.MathUtils.lerp(main.position.y, 0,    0.05)
+      main.rotation.x  = THREE.MathUtils.lerp(main.rotation.x, 0,    0.04)
+      main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1.1, 0.04))
     }
 
     // Cross-section resets
