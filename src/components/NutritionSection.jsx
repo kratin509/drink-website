@@ -110,8 +110,8 @@ export default function NutritionSection() {
             </p>
           </div>
 
-          {/* Right: big callout numbers */}
-          <div ref={nutsRef} className="grid grid-cols-2 gap-4 flex-1">
+          {/* Right: big callout numbers — single vertical column */}
+          <div ref={nutsRef} className="flex flex-col gap-3" style={{ width: '220px', flexShrink: 0 }}>
             {CALLOUTS.map(c => (
               <div key={c.key} className="flex items-stretch gap-4"
                 style={{ padding: '18px 20px', background: '#fff', border: '1px solid rgba(0,0,0,0.07)' }}>
