@@ -1,138 +1,157 @@
 import { useMemo, useEffect } from 'react'
 import * as THREE from 'three'
 
-/**
- * Renders one beverage can.
- * - externalTexture: a THREE.Texture loaded by the parent (from PNG asset)
- * - flavorConfig:    fallback — generate a canvas label from brand data
- */
-export default function CanMesh({ flavorConfig, externalTexture, scale = 1 }) {
-  // Canvas-generated label (only when no external texture supplied)
-  const canvasTex = useMemo(() => {
-    if (externalTexture) return null
+export default function CanMesh({ flavorConfig, scale = 1 }) {
+  /* ── Canvas-generated label texture ───────────────────────────────────── */
+  const labelTex = useMemo(() => {
     if (!flavorConfig) return null
-
     const { canColor, labelColor, name, tagline, accent, nutrition } = flavorConfig
     const W = 1024, H = 512
     const cv = document.createElement('canvas')
     cv.width = W; cv.height = H
     const c = cv.getContext('2d')
 
-    // Radial base
-    const rad = c.createRadialGradient(W * .5, H * .5, 0, W * .5, H * .5, W * .6)
-    rad.addColorStop(0, labelColor)
-    rad.addColorStop(1, canColor)
-    c.fillStyle = rad; c.fillRect(0, 0, W, H)
+    // Background gradient
+    const bg = c.createLinearGradient(0, 0, W, 0)
+    bg.addColorStop(0,    canColor)
+    bg.addColorStop(0.35, labelColor)
+    bg.addColorStop(0.65, labelColor)
+    bg.addColorStop(1,    canColor)
+    c.fillStyle = bg
+    c.fillRect(0, 0, W, H)
 
-    // Vertical shine
-    const shine = c.createLinearGradient(W * .3, 0, W * .7, 0)
-    shine.addColorStop(0, 'rgba(255,255,255,0)')
-    shine.addColorStop(.5, 'rgba(255,255,255,0.13)')
-    shine.addColorStop(1, 'rgba(255,255,255,0)')
-    c.fillStyle = shine; c.fillRect(0, 0, W, H)
+    // Vertical shine streak
+    const shine = c.createLinearGradient(W * 0.28, 0, W * 0.55, 0)
+    shine.addColorStop(0,   'rgba(255,255,255,0)')
+    shine.addColorStop(0.5, 'rgba(255,255,255,0.18)')
+    shine.addColorStop(1,   'rgba(255,255,255,0)')
+    c.fillStyle = shine
+    c.fillRect(0, 0, W, H)
 
-    // Subtle horizontal scan lines
-    c.strokeStyle = 'rgba(255,255,255,0.06)'; c.lineWidth = 1
-    for (let y = 0; y < H; y += 16) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke() }
+    // Dark edge vignette left/right
+    const vig = c.createLinearGradient(0, 0, W, 0)
+    vig.addColorStop(0,    'rgba(0,0,0,0.45)')
+    vig.addColorStop(0.18, 'rgba(0,0,0,0)')
+    vig.addColorStop(0.82, 'rgba(0,0,0,0)')
+    vig.addColorStop(1,    'rgba(0,0,0,0.45)')
+    c.fillStyle = vig
+    c.fillRect(0, 0, W, H)
 
-    // Brand name
+    // Accent top/bottom bands
+    c.fillStyle = accent
+    c.fillRect(0, 0, W, 14)
+    c.fillRect(0, H - 14, W, 14)
+
+    // Macro dark strip at bottom
+    c.fillStyle = 'rgba(0,0,0,0.38)'
+    c.fillRect(0, H * 0.78, W, H * 0.22)
+
+    // NIRO wordmark
     c.save()
-    c.shadowColor = 'rgba(0,0,0,0.55)'; c.shadowBlur = 20
+    c.shadowColor = 'rgba(0,0,0,0.6)'
+    c.shadowBlur = 28
     c.fillStyle = '#fff'
-    c.font = '900 195px "Arial Narrow",Arial'
-    c.textAlign = 'center'; c.textBaseline = 'middle'
-    c.fillText('NIRO', W * .5, H * .30)
+    c.font = '900 210px "Arial Narrow",Arial,sans-serif'
+    c.textAlign = 'center'
+    c.textBaseline = 'alphabetic'
+    c.fillText('NIRO', W * 0.5, H * 0.38)
     c.restore()
 
     // Flavor name
-    c.fillStyle = 'rgba(255,255,255,0.9)'
-    c.font = '700 56px Arial'
-    c.fillText(name.toUpperCase(), W * .5, H * .56)
+    c.fillStyle = 'rgba(255,255,255,0.95)'
+    c.font = `bold 64px Arial,sans-serif`
+    c.textAlign = 'center'
+    c.textBaseline = 'alphabetic'
+    c.fillText(name.toUpperCase(), W * 0.5, H * 0.58)
 
     // Tagline
-    c.fillStyle = 'rgba(255,255,255,0.5)'
-    c.font = '400 34px Arial'
-    c.fillText(tagline.toUpperCase(), W * .5, H * .70)
+    c.fillStyle = 'rgba(255,255,255,0.52)'
+    c.font = '400 38px Arial,sans-serif'
+    c.fillText(tagline.toUpperCase(), W * 0.5, H * 0.70)
 
-    // Macro strip
-    c.fillStyle = 'rgba(0,0,0,0.32)'; c.fillRect(0, H * .82, W, H * .18)
-    c.fillStyle = 'rgba(255,255,255,0.92)'; c.font = '700 30px Arial'
+    // Macro text
+    c.fillStyle = 'rgba(255,255,255,0.9)'
+    c.font = 'bold 34px Arial,sans-serif'
     c.fillText(
-      `${nutrition?.protein ?? '20g'} PROTEIN · ${nutrition?.caffeine ?? '150mg'} CAFFEINE`,
-      W * .5, H * .92
+      `${nutrition?.protein ?? '20g'} PROTEIN  ·  ${nutrition?.caffeine ?? '150mg'} CAFFEINE`,
+      W * 0.5, H * 0.92
     )
 
-    // Accent bands top / bottom
-    c.fillStyle = accent
-    c.fillRect(0, 0, W, 7)
-    c.fillRect(0, H - 7, W, 7)
-
     const tex = new THREE.CanvasTexture(cv)
-    tex.wrapS = THREE.RepeatWrapping
+    tex.wrapS  = THREE.RepeatWrapping
     tex.anisotropy = 16
     return tex
-  }, [flavorConfig?.id, !!externalTexture])   // re-run only when flavor id changes
+  }, [flavorConfig?.id])
 
-  // Dispose canvas texture when component unmounts or texture swaps
-  useEffect(() => {
-    return () => { canvasTex?.dispose() }
-  }, [canvasTex])
+  useEffect(() => () => labelTex?.dispose(), [labelTex])
 
-  const activeTex = externalTexture ?? canvasTex
-
-  const metalMat = useMemo(() =>
-    new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#d2d2d2'),
-      metalness: 0.92,
-      roughness: 0.16,
-      envMapIntensity: 1.5,
-    }), []
-  )
+  /* ── Shared metal material ─────────────────────────────────────────────── */
+  const metal = useMemo(() => new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#c8c8c8'),
+    metalness: 0.94,
+    roughness: 0.14,
+    envMapIntensity: 1.8,
+  }), [])
 
   const s = scale
 
   return (
     <group scale={[s, s, s]}>
-      {/* Label body */}
+
+      {/* ── Label body — open cylinder ─────────────────────────────────── */}
       <mesh castShadow>
-        <cylinderGeometry args={[0.42, 0.42, 1.45, 80, 1, true]} />
+        <cylinderGeometry args={[0.44, 0.44, 1.52, 80, 1, true]} />
         <meshStandardMaterial
-          map={activeTex}
-          metalness={0.5}
-          roughness={0.2}
-          envMapIntensity={1.2}
+          map={labelTex}
+          metalness={0.45}
+          roughness={0.22}
+          envMapIntensity={1.1}
+          side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* Top shoulder */}
-      <mesh position={[0, 0.725, 0]} material={metalMat}>
-        <cylinderGeometry args={[0.34, 0.42, 0.1, 80]} />
+      {/* ── Bottom disk cap ────────────────────────────────────────────── */}
+      <mesh position={[0, -0.76, 0]} rotation={[Math.PI, 0, 0]} castShadow material={metal}>
+        <circleGeometry args={[0.44, 64]} />
       </mesh>
-      {/* Top dome */}
-      <mesh position={[0, 0.79, 0]} material={metalMat}>
-        <sphereGeometry args={[0.34, 80, 20, 0, Math.PI * 2, 0, Math.PI / 2.1]} />
+      {/* Bottom outer rim ring */}
+      <mesh position={[0, -0.755, 0]} material={metal} castShadow>
+        <torusGeometry args={[0.43, 0.016, 8, 80]} />
       </mesh>
-      {/* Lid rim */}
-      <mesh position={[0, 0.82, 0]} material={metalMat}>
-        <torusGeometry args={[0.34, 0.016, 8, 80]} />
-      </mesh>
-      {/* Pull tab body */}
-      <mesh position={[0, 0.848, 0.22]} rotation={[0.32, 0, 0]} material={metalMat}>
-        <boxGeometry args={[0.076, 0.022, 0.11]} />
-      </mesh>
-      {/* Pull tab ring */}
-      <mesh position={[0, 0.86, 0.272]} rotation={[Math.PI / 2, 0, 0]} material={metalMat}>
-        <torusGeometry args={[0.03, 0.01, 8, 20]} />
+      {/* Bottom inner chime (slight inset ring) */}
+      <mesh position={[0, -0.73, 0]} material={metal} castShadow>
+        <torusGeometry args={[0.3, 0.012, 6, 64]} />
       </mesh>
 
-      {/* Bottom shoulder */}
-      <mesh position={[0, -0.725, 0]} material={metalMat}>
-        <cylinderGeometry args={[0.42, 0.36, 0.1, 80]} />
+      {/* ── Top shoulder taper ─────────────────────────────────────────── */}
+      <mesh position={[0, 0.83, 0]} material={metal} castShadow>
+        <cylinderGeometry args={[0.33, 0.44, 0.14, 80]} />
       </mesh>
-      {/* Bottom dome (inverted) */}
-      <mesh position={[0, -0.79, 0]} rotation={[Math.PI, 0, 0]} material={metalMat}>
-        <sphereGeometry args={[0.34, 80, 20, 0, Math.PI * 2, 0, Math.PI / 2.8]} />
+
+      {/* ── Neck ───────────────────────────────────────────────────────── */}
+      <mesh position={[0, 0.92, 0]} material={metal} castShadow>
+        <cylinderGeometry args={[0.33, 0.33, 0.04, 80]} />
       </mesh>
+
+      {/* ── Lid disk ───────────────────────────────────────────────────── */}
+      <mesh position={[0, 0.942, 0]} material={metal} castShadow>
+        <cylinderGeometry args={[0.33, 0.33, 0.012, 80]} />
+      </mesh>
+
+      {/* ── Lid outer rim ──────────────────────────────────────────────── */}
+      <mesh position={[0, 0.946, 0]} material={metal} castShadow>
+        <torusGeometry args={[0.32, 0.018, 8, 80]} />
+      </mesh>
+
+      {/* ── Pull tab body ──────────────────────────────────────────────── */}
+      <mesh position={[0, 0.965, 0.19]} rotation={[0.28, 0, 0]} material={metal} castShadow>
+        <boxGeometry args={[0.072, 0.016, 0.1]} />
+      </mesh>
+      {/* Pull tab ring */}
+      <mesh position={[0, 0.972, 0.262]} rotation={[Math.PI / 2, 0, 0]} material={metal} castShadow>
+        <torusGeometry args={[0.028, 0.009, 8, 24]} />
+      </mesh>
+
     </group>
   )
 }
