@@ -3,52 +3,86 @@ import gsap from 'gsap'
 import { useFlavorStore } from '../store/flavorStore'
 
 export default function Navbar() {
-  const navRef = useRef(null)
+  const navRef = useRef()
   const { activeFlavor } = useFlavorStore()
 
   useEffect(() => {
     gsap.fromTo(
       navRef.current,
       { yPercent: -100, opacity: 0 },
-      { yPercent: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power3.out' }
+      { yPercent: 0, opacity: 1, duration: 0.9, delay: 0.2, ease: 'power3.out' }
     )
   }, [])
 
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 mix-blend-multiply"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between"
+      style={{
+        padding: '20px 32px',
+        background: 'rgba(248,248,246,0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
+      }}
     >
       {/* Logo */}
       <a
         href="#hero"
-        className="font-display text-3xl tracking-tighter leading-none text-[#0a0a0a]"
-        style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}
+        style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 900,
+          fontSize: '1.6rem',
+          letterSpacing: '-0.02em',
+          textDecoration: 'none',
+          color: '#0a0a0a',
+          lineHeight: 1,
+        }}
       >
-        NIRO
-        <span style={{ color: activeFlavor.accent }}>.</span>
+        NIRO<span style={{ color: activeFlavor.accent, transition: 'color 0.4s' }}>.</span>
       </a>
 
-      {/* Links */}
-      <div className="flex items-center gap-8">
-        <a
-          href="#flavors"
-          className="font-display text-sm tracking-widest uppercase text-[#0a0a0a] hover:opacity-60 transition-opacity"
-          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700 }}
-        >
-          Flavors
-        </a>
-        <a
-          href="#nutrition"
-          className="font-display text-sm tracking-widest uppercase text-[#0a0a0a] hover:opacity-60 transition-opacity"
-          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700 }}
-        >
-          Nutrition
-        </a>
+      {/* Navigation links */}
+      <div className="flex items-center gap-10">
+        {[
+          { label: 'Flavors', href: '#flavors' },
+          { label: 'Nutrition', href: '#nutrition' },
+        ].map(({ label, href }) => (
+          <a
+            key={label}
+            href={href}
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: '#0a0a0a',
+              textDecoration: 'none',
+              opacity: 0.6,
+              transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={(e) => (e.target.style.opacity = 1)}
+            onMouseLeave={(e) => (e.target.style.opacity = 0.6)}
+          >
+            {label}
+          </a>
+        ))}
+
         <a
           href="#cta"
-          className="btn-primary text-sm py-2 px-6"
-          style={{ background: activeFlavor.accent, transition: 'background 0.4s' }}
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: '0.8rem',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: '#ffffff',
+            background: activeFlavor.accent,
+            transition: 'background 0.4s',
+            padding: '10px 22px',
+            textDecoration: 'none',
+          }}
         >
           Buy Now
         </a>

@@ -17,7 +17,7 @@ export default function FooterSection() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         taglineRef.current,
-        { opacity: 0, y: 80 },
+        { opacity: 0, y: 60 },
         {
           opacity: 1,
           y: 0,
@@ -28,7 +28,7 @@ export default function FooterSection() {
       )
       gsap.fromTo(
         formRef.current,
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
@@ -48,7 +48,7 @@ export default function FooterSection() {
       gsap.fromTo(
         formRef.current,
         { scale: 1 },
-        { scale: 1.02, duration: 0.15, yoyo: true, repeat: 1 }
+        { scale: 1.015, duration: 0.15, yoyo: true, repeat: 1 }
       )
     }
   }
@@ -57,19 +57,23 @@ export default function FooterSection() {
     <footer
       id="cta"
       ref={sectionRef}
-      className="relative overflow-hidden bg-[#f8f8f6] pt-32 pb-16 px-8 md:px-16"
+      className="relative overflow-hidden py-32 px-8 md:px-16 lg:px-24"
+      style={{ background: '#f8f8f6' }}
     >
-      {/* Large decorative text */}
+      {/* Giant watermark "NIRO" — purely decorative */}
       <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
         aria-hidden="true"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
       >
         <span
-          className="font-display font-black text-[25vw] leading-none tracking-tighter"
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 900,
+            fontSize: 'clamp(12rem, 38vw, 38rem)',
+            lineHeight: 1,
             color: `rgba(${activeFlavor.accentRgb}, 0.05)`,
             transition: 'color 0.4s',
+            letterSpacing: '-0.04em',
           }}
         >
           NIRO
@@ -77,64 +81,113 @@ export default function FooterSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-3xl mx-auto text-center">
-        {/* Tagline */}
+      <div className="relative z-10 max-w-2xl mx-auto text-center">
+
+        {/* Big tagline */}
         <div ref={taglineRef}>
           <h2
-            className="headline-fill text-[#0a0a0a] mb-4"
-            style={{ fontSize: 'clamp(3rem, 10vw, 9rem)' }}
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 900,
+              fontSize: 'clamp(4rem, 11vw, 11rem)',
+              lineHeight: 0.88,
+              letterSpacing: '-0.02em',
+              textTransform: 'uppercase',
+              color: '#0a0a0a',
+            }}
           >
-            READY TO
+            Ready To
           </h2>
           <h2
-            className="headline-fill mb-12"
-            style={{ fontSize: 'clamp(3rem, 10vw, 9rem)', color: activeFlavor.accent, transition: 'color 0.4s' }}
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 900,
+              fontSize: 'clamp(4rem, 11vw, 11rem)',
+              lineHeight: 0.88,
+              letterSpacing: '-0.02em',
+              textTransform: 'uppercase',
+              color: activeFlavor.accent,
+              transition: 'color 0.4s',
+              marginBottom: '32px',
+            }}
           >
-            PUSH?
+            Push?
           </h2>
-          <p className="text-[#0a0a0a]/60 text-xl mb-16 max-w-md mx-auto" style={{ fontFamily: "'Barlow', sans-serif" }}>
-            Be first to know when new flavors drop. Get 20% off your first case.
+          <p
+            className="mx-auto mb-14"
+            style={{
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: '1.1rem',
+              color: 'rgba(10,10,10,0.5)',
+              maxWidth: '36ch',
+              lineHeight: 1.7,
+            }}
+          >
+            Be first to know when new flavors drop.
+            Get 20% off your first case.
           </p>
         </div>
 
         {/* Email form */}
-        <div ref={formRef} className="mb-20">
+        <div ref={formRef} className="mb-14">
           {submitted ? (
-            <div
-              className="font-display text-4xl font-black uppercase tracking-tight py-8"
-              style={{ fontFamily: "'Barlow Condensed', sans-serif", color: activeFlavor.accent }}
+            <p
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 900,
+                fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
+                textTransform: 'uppercase',
+                color: activeFlavor.accent,
+                letterSpacing: '-0.01em',
+              }}
             >
               You're In. Get Ready. ↗
-            </div>
+            </p>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto"
+            >
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="flex-1 px-6 py-4 text-base border-2 border-black/20 bg-white outline-none focus:border-current transition-colors"
-                style={{ fontFamily: "'Barlow', sans-serif", '--tw-ring-color': activeFlavor.accent }}
+                className="flex-1 outline-none transition-colors"
+                style={{
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: '1rem',
+                  padding: '14px 20px',
+                  border: '2px solid rgba(0,0,0,0.15)',
+                  background: '#ffffff',
+                }}
                 onFocus={(e) => (e.target.style.borderColor = activeFlavor.accent)}
-                onBlur={(e) => (e.target.style.borderColor = 'rgba(0,0,0,0.2)')}
+                onBlur={(e) => (e.target.style.borderColor = 'rgba(0,0,0,0.15)')}
               />
               <button
                 type="submit"
-                className="btn-primary whitespace-nowrap px-8 py-4"
-                style={{ background: activeFlavor.accent, transition: 'background 0.4s' }}
+                className="btn-primary whitespace-nowrap"
+                style={{
+                  background: activeFlavor.accent,
+                  transition: 'background 0.4s',
+                  padding: '14px 28px',
+                }}
               >
-                Claim My 20% →
+                Claim 20% Off →
               </button>
             </form>
           )}
-          <p className="mt-4 text-xs opacity-40">
+          <p
+            className="mt-4"
+            style={{ fontSize: '0.75rem', opacity: 0.35 }}
+          >
             No spam. Unsubscribe anytime. We respect your inbox.
           </p>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-20">
+        {/* CTA buttons */}
+        <div className="flex flex-wrap justify-center gap-4 mb-6">
           <a
             href="#flavors"
             className="btn-primary"
@@ -149,12 +202,19 @@ export default function FooterSection() {
       </div>
 
       {/* Bottom bar */}
-      <div className="relative z-10 border-t-2 border-black/10 pt-8 mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div
+        className="relative z-10 pt-10 mt-12 flex flex-col md:flex-row items-center justify-between gap-6"
+        style={{ borderTop: '1px solid rgba(0,0,0,0.1)' }}
+      >
         <div
-          className="font-display font-black text-2xl tracking-tighter"
-          style={{ fontFamily: "'Barlow Condensed', sans-serif" }}
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 900,
+            fontSize: '1.5rem',
+            letterSpacing: '-0.02em',
+          }}
         >
-          NIRO<span style={{ color: activeFlavor.accent }}>.</span>
+          NIRO<span style={{ color: activeFlavor.accent, transition: 'color 0.4s' }}>.</span>
         </div>
 
         <div className="flex gap-8">
@@ -162,15 +222,26 @@ export default function FooterSection() {
             <a
               key={s}
               href="#"
-              className="font-display text-xs tracking-widest uppercase opacity-50 hover:opacity-100 transition-opacity"
-              style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700 }}
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: '#0a0a0a',
+                opacity: 0.4,
+                transition: 'opacity 0.2s',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => (e.target.style.opacity = 1)}
+              onMouseLeave={(e) => (e.target.style.opacity = 0.4)}
             >
               {s}
             </a>
           ))}
         </div>
 
-        <p className="text-xs opacity-30" style={{ fontFamily: "'Barlow', sans-serif" }}>
+        <p style={{ fontSize: '0.75rem', opacity: 0.3 }}>
           © 2025 Niro Beverages. All rights reserved.
         </p>
       </div>

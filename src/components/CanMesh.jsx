@@ -81,60 +81,63 @@ export default function CanMesh({ scrollState }) {
     if (!groupRef.current) return
     const { section, progress } = scrollState
 
-    // Hero: gentle float
+    // Hero: sit right-of-center, gentle float + slow spin
     if (section === 0) {
-      groupRef.current.rotation.y += delta * 0.4
-      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.08
+      groupRef.current.rotation.y += delta * 0.35
+      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.1
+      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, 1.4, 0.04)
     }
 
-    // Flavors: translate + full spin
+    // Flavors: sweep left→right across screen with full spin
     if (section === 1) {
       const p = progress
-      groupRef.current.position.x = (p - 0.5) * 3.5
-      groupRef.current.rotation.y = p * Math.PI * 2
-      groupRef.current.rotation.z = p * Math.PI * 0.3
-      groupRef.current.position.y = Math.sin(p * Math.PI) * 0.4
-    }
-
-    // Nutrition: spin to back, zoom in
-    if (section === 2) {
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(
-        groupRef.current.rotation.y,
-        Math.PI,
-        0.05
-      )
       groupRef.current.position.x = THREE.MathUtils.lerp(
         groupRef.current.position.x,
-        0,
-        0.05
+        (p - 0.5) * 3.0,
+        0.06
       )
-      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1.5, 0.04))
-    }
-
-    // CTA: tilt toward user + pour
-    if (section === 3) {
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(
-        groupRef.current.rotation.x,
-        -0.5,
-        0.04
+      groupRef.current.rotation.y += delta * 2.5
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(
+        groupRef.current.rotation.z,
+        Math.sin(p * Math.PI) * 0.25,
+        0.05
       )
       groupRef.current.position.y = THREE.MathUtils.lerp(
         groupRef.current.position.y,
-        0.5,
-        0.04
+        Math.sin(p * Math.PI) * 0.35,
+        0.05
       )
-      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1.1, 0.04))
     }
 
-    // Reset scale for non-nutrition sections
+    // Nutrition: shift right, spin to back, gentle zoom
+    if (section === 2) {
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(
+        groupRef.current.rotation.y,
+        Math.PI * 1.0,
+        0.04
+      )
+      groupRef.current.position.x = THREE.MathUtils.lerp(
+        groupRef.current.position.x,
+        1.1,
+        0.05
+      )
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, 0, 0.05)
+      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1.35, 0.04))
+    }
+
+    // CTA: center, tilt toward user, pour
+    if (section === 3) {
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -0.45, 0.04)
+      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, 0, 0.04)
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, 0.4, 0.04)
+      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1.05, 0.04))
+    }
+
     if (section !== 2 && section !== 3) {
       groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1, 0.04))
     }
     if (section !== 3) {
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, 0.04)
-    }
-    if (section !== 1) {
-      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, 0, 0.04)
     }
   })
 
