@@ -50,13 +50,13 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x,   1,    0.05))
     }
 
-    /* Section 1 — Flavors: sweep across + fast spin */
+    /* Section 1 — Flavors: stay right, gentle float + fast spin */
     if (section === 1) {
-      const sweep = (progress - 0.5) * 3.2
-      main.position.x = THREE.MathUtils.lerp(main.position.x, sweep, 0.06)
-      main.position.y = THREE.MathUtils.lerp(main.position.y, Math.sin(progress * Math.PI) * 0.44, 0.06)
+      const floatX = 1.85 - Math.sin(progress * Math.PI) * 0.25
+      main.position.x = THREE.MathUtils.lerp(main.position.x, floatX, 0.055)
+      main.position.y = THREE.MathUtils.lerp(main.position.y, Math.sin(progress * Math.PI) * 0.28, 0.06)
       main.rotation.y += delta * 2.8
-      main.rotation.z  = THREE.MathUtils.lerp(main.rotation.z, Math.sin(progress * Math.PI) * 0.26, 0.06)
+      main.rotation.z  = THREE.MathUtils.lerp(main.rotation.z, Math.sin(progress * Math.PI) * 0.18, 0.06)
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1, 0.05))
     }
 
