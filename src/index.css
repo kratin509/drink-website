@@ -35,11 +35,19 @@ body {
 }
 
 /* ── Z-index blueprint ────────────────────────────────────────────────── */
-/* z-0  → fixed WebGL canvas (background layer, pointer-events: none)     */
-/* z-10 → scrolling DOM content wrapper                                    */
-/*        within sections: z-0 = decorative bg word, z-10 = UI content    */
-/* z-50 → Navbar                                                            */
+/* z-10 → bg typography word (absolute within section)                     */
+/* z-20 → UI content (absolute within section)                             */
+/* z-[40] → WebGL canvas (fixed, pointer-events: none, above all content) */
+/* z-50  → Navbar                                                           */
 /* z-[9999] → Preloader overlay                                             */
+
+/* ── Section frame — every section is a full-viewport locked cell ──── */
+.section-frame {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
 
 /* ── Typography system ──────────────────────────────────────────────────── */
 .vp-word {
