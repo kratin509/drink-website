@@ -69,8 +69,15 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1.38, 0.04))
     }
 
-    /* Section 3 — CTA: center, pour tilt */
-    if (section >= 3) {
+    /* Section 3 — Social proof: slide off right edge, out of the way */
+    if (section === 3) {
+      main.position.x  = THREE.MathUtils.lerp(main.position.x, 3.8,  0.05)
+      main.position.y  = THREE.MathUtils.lerp(main.position.y, 0,    0.05)
+      main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 0.7, 0.05))
+    }
+
+    /* Section 4 — CTA: center, pour tilt */
+    if (section >= 4) {
       main.position.x  = THREE.MathUtils.lerp(main.position.x, 1.6,   0.05)
       main.position.y  = THREE.MathUtils.lerp(main.position.y, 0.2,   0.05)
       main.rotation.x  = THREE.MathUtils.lerp(main.rotation.x, -0.42, 0.04)
@@ -78,9 +85,9 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
     }
 
     // Cross-section resets
-    if (section !== 2 && section < 3)
+    if (section !== 2 && section < 4)
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1, 0.04))
-    if (section < 3)
+    if (section < 4)
       main.rotation.x = THREE.MathUtils.lerp(main.rotation.x, 0, 0.04)
     if (section !== 1 && section !== 2)
       main.rotation.z = THREE.MathUtils.lerp(main.rotation.z, 0, 0.05)
@@ -89,7 +96,7 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
   return (
     <group ref={mainRef} scale={[0, 0, 0]}>
       <CanMesh flavorConfig={activeFlavor} />
-      <LiquidPour active={(scrollState?.section ?? 0) >= 3} />
+      <LiquidPour active={(scrollState?.section ?? 0) >= 4} />
     </group>
   )
 })

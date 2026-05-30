@@ -17,7 +17,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 function ScrollProvider({ children, onScrollChange }) {
   useEffect(() => {
-    const sectionIds = ['#hero', '#flavors', '#nutrition', '#cta']
+    const sectionIds = ['#hero', '#flavors', '#nutrition', '#social', '#cta']
     const els = sectionIds.map(s => document.querySelector(s)).filter(Boolean)
     if (!els.length) return
 
