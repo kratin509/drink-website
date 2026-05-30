@@ -1,47 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Barlow:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
-/* ── Design tokens ──────────────────────────────────────────────────────── */
+/* ─── Design tokens ────────────────────────────────────────────────────────── */
 :root {
-  --accent:       #dc2626;
-  --accent-rgb:   220, 38, 38;
-  --page-bg:      #f2f1ef;
-  --dark:         #080808;
-  --canvas-z:     40;   /* WebGL canvas always above sections */
-  --nav-z:        60;   /* Navbar above canvas */
-  --loader-z:     9999; /* Preloader topmost */
+  --accent:     #dc2626;
+  --accent-rgb: 220, 38, 38;
+  --page-bg:    #f0eeeb;
+  --dark:       #080808;
+  --mid:        #1a1a1a;
+  --muted:      rgba(10,10,10,0.42);
 }
 
-/* ── Reset ─────────────────────────────────────────────────────────────── */
+/* ─── Reset ────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html   { scroll-behavior: auto; overflow-x: hidden; }
+body   { font-family: 'Barlow', sans-serif; background: var(--page-bg); color: var(--dark); overflow-x: hidden; }
+#root  { width: 100%; max-width: 100%; margin: 0; text-align: left; border: none; display: block; }
 
-html { scroll-behavior: auto; overflow-x: hidden; }
-
-body {
-  font-family: 'Barlow', sans-serif;
-  background: var(--page-bg);
-  color: var(--dark);
-  overflow-x: hidden;
-}
-
-/* Root is a clean pass-through — no border / centering constraints */
-#root {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  text-align: left;
-  border: none;
-  display: block;
-}
-
-/* ── Z-index blueprint ────────────────────────────────────────────────── */
-/* z-10 → bg typography word (absolute within section)                     */
-/* z-20 → UI content (absolute within section)                             */
-/* z-[40] → WebGL canvas (fixed, pointer-events: none, above all content) */
-/* z-50  → Navbar                                                           */
-/* z-[9999] → Preloader overlay                                             */
-
-/* ── Section frame — every section is a full-viewport locked cell ──── */
+/* ─── Section frame: every section is an exact viewport cell ───────────────── */
 .section-frame {
   width: 100vw;
   height: 100vh;
@@ -49,7 +25,37 @@ body {
   position: relative;
 }
 
-/* ── Typography system ──────────────────────────────────────────────────── */
+/* ─── Z-index layers ────────────────────────────────────────────────────────── */
+/* z-10  → decorative bg word (absolute, within section)                        */
+/* z-20  → UI content (absolute, within section)                                */
+/* z-[40]→ WebGL canvas (fixed, pointer-events:none — floats above sections)   */
+/* z-50  → Navbar                                                                */
+/* z-[9999] → Preloader                                                          */
+
+/* ─── Type scale ────────────────────────────────────────────────────────────── */
+.display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+}
+.headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+}
+.eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+/* Ghost background word */
 .vp-word {
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 900;
@@ -61,24 +67,27 @@ body {
   pointer-events: none;
 }
 
-.headline {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 900;
-  text-transform: uppercase;
-  line-height: 0.88;
-  letter-spacing: -0.03em;
-}
-
-.label-tag {
+/* ─── Buttons ───────────────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--dark);
+  color: #fff;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  font-size: 0.68rem;
-  letter-spacing: 0.28em;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  padding: 14px 32px;
+  border: 2px solid var(--dark);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.22s, color 0.22s, transform 0.15s;
 }
+.btn-primary:hover { background: transparent; color: var(--dark); transform: translateY(-2px); }
 
-/* ── CTA buttons ────────────────────────────────────────────────────────── */
-.btn-primary {
+.btn-accent {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -86,18 +95,18 @@ body {
   color: #fff;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  font-size: 0.88rem;
-  letter-spacing: 0.14em;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 13px 28px;
-  border: none;
+  padding: 14px 32px;
+  border: 2px solid var(--accent);
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.2s, transform 0.15s;
+  transition: background 0.22s, border-color 0.22s, transform 0.15s;
 }
-.btn-primary:hover { background: var(--dark); transform: translateY(-2px); }
+.btn-accent:hover { background: var(--dark); border-color: var(--dark); transform: translateY(-2px); }
 
-.btn-outline {
+.btn-ghost {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -105,41 +114,43 @@ body {
   color: var(--dark);
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  font-size: 0.88rem;
-  letter-spacing: 0.14em;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 11px 28px;
-  border: 2px solid var(--dark);
+  padding: 12px 30px;
+  border: 1.5px solid rgba(10,10,10,0.22);
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.2s, color 0.2s, transform 0.15s;
+  transition: border-color 0.22s, background 0.22s, transform 0.15s;
 }
-.btn-outline:hover { background: var(--dark); color: #fff; transform: translateY(-2px); }
+.btn-ghost:hover { border-color: var(--dark); background: var(--dark); color: #fff; transform: translateY(-2px); }
 
-/* ── Ticker tape ────────────────────────────────────────────────────────── */
-@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-.ticker-inner { animation: ticker 20s linear infinite; }
+/* ─── Ingredient pill ──────────────────────────────────────────────────────── */
+.pill {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 0;
+}
 
-/* ── Nutrition label rows ───────────────────────────────────────────────── */
+/* ─── Nutrition label rows ─────────────────────────────────────────────────── */
 .nut-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   padding: 5px 0;
   border-top: 1px solid rgba(0,0,0,0.1);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
 }
 
-/* ── Portfolio card hover ───────────────────────────────────────────────── */
-.proj-card {
-  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
-}
-.proj-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-}
+/* ─── Ticker tape ───────────────────────────────────────────────────────────── */
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.ticker-track { animation: ticker 24s linear infinite; }
 
-/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--page-bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent); }

@@ -9,6 +9,8 @@ export default function HeroSection() {
   const sectionRef = useRef()
   const bgRef      = useRef()
   const lineRef    = useRef()
+  const h1aRef     = useRef()
+  const h1bRef     = useRef()
   const copyRef    = useRef()
   const ctaRef     = useRef()
   const statsRef   = useRef()
@@ -16,19 +18,19 @@ export default function HeroSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Bg word parallax
       gsap.to(bgRef.current, {
-        yPercent: -8, ease: 'none',
+        yPercent: -10, ease: 'none',
         scrollTrigger: { trigger: sectionRef.current, start: 'top bottom', end: 'bottom top', scrub: true },
       })
     }, sectionRef)
 
-    // Entrance sequence
-    const tl = gsap.timeline({ delay: 0.1 })
-    tl.fromTo(lineRef.current,  { scaleX: 0 },         { scaleX: 1, duration: 0.7, ease: 'expo.out', transformOrigin: 'left' })
-    tl.fromTo(copyRef.current,  { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.4')
-    tl.fromTo(ctaRef.current,   { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5')
-    tl.fromTo(statsRef.current, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.4')
+    const tl = gsap.timeline({ delay: 0.05 })
+    tl.fromTo(lineRef.current,  { scaleX: 0 },          { scaleX: 1, duration: 0.55, ease: 'expo.out', transformOrigin: 'left' })
+    tl.fromTo(h1aRef.current,   { opacity: 0, y: 40 },  { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.2')
+    tl.fromTo(h1bRef.current,   { opacity: 0, y: 40 },  { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.6')
+    tl.fromTo(copyRef.current,  { opacity: 0, y: 20 },  { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, '-=0.5')
+    tl.fromTo(ctaRef.current,   { opacity: 0, y: 16 },  { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, '-=0.45')
+    tl.fromTo(statsRef.current, { opacity: 0 },         { opacity: 1, duration: 0.5 }, '-=0.3')
 
     return () => ctx.revert()
   }, [])
@@ -36,68 +38,87 @@ export default function HeroSection() {
   return (
     <section id="hero" ref={sectionRef} className="section-frame" style={{ background: 'var(--page-bg)' }}>
 
-      {/* z-10: background typography */}
+      {/* Parallax ghost word */}
       <div ref={bgRef} aria-hidden="true"
-        className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden select-none pointer-events-none">
-        <span className="vp-word text-[#0a0a0a]" style={{ fontSize: 'clamp(9rem, 26vw, 32rem)', opacity: 0.048 }}>
+        className="absolute inset-0 z-10 flex items-end justify-start overflow-hidden pointer-events-none select-none"
+        style={{ paddingLeft: '6vw', paddingBottom: '2vh' }}>
+        <span className="vp-word text-[#0a0a0a]"
+          style={{ fontSize: 'clamp(10rem, 28vw, 36rem)', opacity: 0.038 }}>
           NIRO
         </span>
       </div>
 
-      {/* z-20: UI content */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-end px-8 md:px-16 lg:px-24 pb-14">
+      {/* UI layer */}
+      <div className="absolute inset-0 z-20 flex flex-col justify-center"
+        style={{ paddingLeft: '8vw', paddingRight: '8vw', paddingTop: '80px' }}>
 
-        {/* Section label + rule */}
-        <div ref={lineRef} className="flex items-center gap-3 mb-8 origin-left">
-          <div className="h-px w-8" style={{ background: activeFlavor.accent, transition: 'background 0.4s' }} />
-          <span className="label-tag" style={{ color: activeFlavor.accent, opacity: 0.85, transition: 'color 0.4s' }}>
-            01 / The Drink
+        {/* Eyebrow */}
+        <div ref={lineRef} className="flex items-center gap-3 mb-7 origin-left">
+          <div style={{ width: '28px', height: '1px', background: activeFlavor.accent, transition: 'background 0.4s' }} />
+          <span className="eyebrow" style={{ color: activeFlavor.accent, opacity: 0.9, transition: 'color 0.4s' }}>
+            01 &nbsp;/&nbsp; Performance Drink
           </span>
         </div>
 
-        {/* Headline + copy — left half, clears the 3D can */}
-        <div ref={copyRef} style={{ maxWidth: '50vw' }}>
-          <h1 className="headline text-[#0a0a0a] mb-1" style={{ fontSize: 'clamp(4rem, 10vw, 10.5rem)' }}>
-            NIRO
+        {/* Headline — max 45vw so can reads freely on right */}
+        <div style={{ maxWidth: '46vw' }}>
+          <h1 ref={h1aRef} className="display text-[#0a0a0a]"
+            style={{ fontSize: 'clamp(4.5rem, 10vw, 11rem)', marginBottom: '0.06em' }}>
+            Fuel The
           </h1>
-          <p className="headline mb-8" style={{ fontSize: 'clamp(1.5rem, 3.8vw, 4.2rem)', color: activeFlavor.accent, transition: 'color 0.4s' }}>
-            Protein&nbsp;+&nbsp;Caffeine
+          <h1 ref={h1bRef} className="display" style={{
+            fontSize: 'clamp(4.5rem, 10vw, 11rem)',
+            color: activeFlavor.accent, transition: 'color 0.45s',
+            marginBottom: '0.55em',
+          }}>
+            Relentless.
+          </h1>
+
+          <p ref={copyRef} style={{
+            fontFamily: "'Barlow', sans-serif", fontWeight: 300,
+            fontSize: 'clamp(0.9rem, 1.1vw, 1rem)',
+            lineHeight: 1.85, color: 'rgba(10,10,10,0.48)',
+            maxWidth: '36ch', marginBottom: '2.2rem',
+          }}>
+            20g protein. 150mg caffeine. Zero sugar. One can engineered for
+            the people who don't stop when it gets hard.
           </p>
-          <p className="mb-8 leading-relaxed"
-            style={{ fontFamily: "'Barlow', sans-serif", fontSize: 'clamp(0.88rem, 1.15vw, 1.05rem)', color: 'rgba(10,10,10,0.5)', maxWidth: '38ch' }}>
-            The only performance drink built for the relentless.
-            Real protein, real caffeine, zero noise.
-          </p>
+
+          {/* CTA row */}
+          <div ref={ctaRef} className="flex items-center gap-4 mb-12">
+            <a href="#cta" className="btn-accent"
+              style={{ background: activeFlavor.accent, borderColor: activeFlavor.accent, transition: 'background 0.4s, border-color 0.4s' }}>
+              Get Yours →
+            </a>
+            <a href="#flavors" className="btn-ghost">See Flavors</a>
+          </div>
         </div>
 
-        {/* CTAs */}
-        <div ref={ctaRef} className="flex flex-wrap gap-4 mb-10">
-          <a href="#cta" className="btn-primary" style={{ background: activeFlavor.accent, transition: 'background 0.4s' }}>
-            Get Yours →
-          </a>
-          <a href="#flavors" className="btn-outline">See Flavors</a>
-        </div>
-
-        {/* Key stats */}
-        <div ref={statsRef} className="flex flex-wrap gap-8">
+        {/* Stats strip */}
+        <div ref={statsRef} className="flex items-center gap-10"
+          style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '1.4rem', maxWidth: '46vw' }}>
           {[
-            { val: '20g',   lbl: 'Protein'  },
-            { val: '150mg', lbl: 'Caffeine' },
-            { val: '0g',    lbl: 'Sugar'    },
-            { val: '160',   lbl: 'Kcal'     },
-          ].map(({ val, lbl }) => (
-            <div key={lbl}>
-              <div className="headline" style={{ fontSize: 'clamp(1.4rem, 2vw, 2rem)', color: activeFlavor.accent, transition: 'color 0.4s' }}>{val}</div>
-              <div className="label-tag" style={{ opacity: 0.38 }}>{lbl}</div>
+            { val: '20g',   lbl: 'Protein'   },
+            { val: '150mg', lbl: 'Caffeine'  },
+            { val: '0g',    lbl: 'Sugar'     },
+            { val: '160',   lbl: 'Calories'  },
+          ].map(({ val, lbl }, i) => (
+            <div key={lbl} className="flex items-baseline gap-2">
+              <span className="headline" style={{
+                fontSize: 'clamp(1.3rem, 1.8vw, 1.9rem)',
+                color: activeFlavor.accent, transition: 'color 0.4s',
+              }}>{val}</span>
+              <span className="eyebrow" style={{ opacity: 0.36, fontSize: '0.58rem' }}>{lbl}</span>
+              {i < 3 && <div style={{ width: '1px', height: '18px', background: 'rgba(0,0,0,0.12)', marginLeft: '0.6rem' }} />}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Scroll cue */}
-      <div className="absolute bottom-8 right-8 z-20 flex flex-col items-center gap-2" style={{ opacity: 0.28 }}>
-        <div style={{ width: 1, height: 52, background: `linear-gradient(to bottom, transparent, ${activeFlavor.accent})`, transition: 'background 0.4s' }} />
-        <span className="label-tag" style={{ writingMode: 'vertical-rl', letterSpacing: '0.32em', fontSize: '0.6rem' }}>Scroll</span>
+      {/* Scroll indicator — bottom right */}
+      <div className="absolute bottom-8 right-10 z-20 flex flex-col items-center gap-2" style={{ opacity: 0.25 }}>
+        <div style={{ width: '1px', height: '48px', background: `linear-gradient(to bottom, transparent, ${activeFlavor.accent})`, transition: 'background 0.4s' }} />
+        <span className="eyebrow" style={{ writingMode: 'vertical-rl', letterSpacing: '0.38em', fontSize: '0.55rem' }}>Scroll</span>
       </div>
     </section>
   )
