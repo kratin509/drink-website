@@ -84,7 +84,7 @@ export default function SocialProofSection() {
   }, [])
 
   return (
-    <section id="social" ref={sectionRef} className="section-frame" style={{ background: 'var(--dark)' }}>
+    <section id="social" ref={sectionRef} className="section-frame relative z-[41]" style={{ background: 'var(--dark)' }}>
 
       {/* Ghost word */}
       <div ref={bgRef} aria-hidden="true"
