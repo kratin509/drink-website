@@ -28,7 +28,7 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
       tl.to(main.scale,    { x: 1,   y: 1,   z: 1,   duration: 0.58, ease: 'back.out(2.2)' }, 0.38)
       tl.to(main.position, { x: 1.85, z: 0,  duration: 0.58, ease: 'back.out(2.2)' }, 0.38)
       // Settle into upside-down tilt
-      tl.to(main.rotation, { x: Math.PI, z: 0.28, duration: 0.58, ease: 'back.out(2.2)' }, 0.38)
+      tl.to(main.rotation, { x: Math.PI, z: 0.52, duration: 0.58, ease: 'back.out(2.2)' }, 0.38)
     },
   }))
 
@@ -48,7 +48,7 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
     if (section === 0) {
       main.rotation.y += delta * 0.3
       main.rotation.x  = THREE.MathUtils.lerp(main.rotation.x, Math.PI, 0.04)
-      main.rotation.z  = THREE.MathUtils.lerp(main.rotation.z, 0.28,    0.04)
+      main.rotation.z  = THREE.MathUtils.lerp(main.rotation.z, 0.52,    0.04)
       main.position.x  = THREE.MathUtils.lerp(main.position.x, 1.85,    0.055)
       main.position.y  = Math.sin(t * 0.7) * 0.12
       main.position.z  = THREE.MathUtils.lerp(main.position.z, 0,       0.05)

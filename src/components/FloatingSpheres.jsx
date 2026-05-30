@@ -4,12 +4,12 @@ import * as THREE from 'three'
 import { useFlavorStore } from '../store/flavorStore'
 
 const SPHERES = [
-  { pos: [-2.2,  0.8, -1.2], r: 0.13, speed: 0.7,  phase: 0.0, amp: 0.18 },
-  { pos: [ 2.8,  1.2, -1.8], r: 0.09, speed: 1.1,  phase: 1.2, amp: 0.22 },
-  { pos: [-1.4, -1.0, -0.8], r: 0.16, speed: 0.55, phase: 2.1, amp: 0.15 },
-  { pos: [ 3.4, -0.6, -1.4], r: 0.10, speed: 0.9,  phase: 0.8, amp: 0.20 },
-  { pos: [ 0.6,  1.8, -2.0], r: 0.07, speed: 1.3,  phase: 3.0, amp: 0.12 },
-  { pos: [-2.8, -0.2, -1.6], r: 0.11, speed: 0.65, phase: 1.7, amp: 0.16 },
+  { pos: [ 1.1,  1.4, -1.0], r: 0.10, speed: 0.7,  phase: 0.0, amp: 0.18 },
+  { pos: [ 2.8,  1.1, -1.6], r: 0.09, speed: 1.1,  phase: 1.2, amp: 0.22 },
+  { pos: [ 3.5,  0.2, -1.2], r: 0.13, speed: 0.55, phase: 2.1, amp: 0.15 },
+  { pos: [ 3.2, -0.8, -1.4], r: 0.10, speed: 0.9,  phase: 0.8, amp: 0.20 },
+  { pos: [ 1.4, -1.2, -0.8], r: 0.07, speed: 1.3,  phase: 3.0, amp: 0.12 },
+  { pos: [ 2.2,  0.5, -2.0], r: 0.11, speed: 0.65, phase: 1.7, amp: 0.16 },
 ]
 
 export default function FloatingSpheres() {
