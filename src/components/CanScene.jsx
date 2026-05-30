@@ -25,7 +25,7 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
       tl.to(main.scale,    { x: 2.6, y: 2.6, z: 2.6, duration: 0.38, ease: 'expo.out' }, 0)
       tl.to(main.position, { z: 1.4,          duration: 0.38, ease: 'expo.out' }, 0)
       tl.to(main.scale,    { x: 1,   y: 1,   z: 1,   duration: 0.58, ease: 'back.out(2.2)' }, 0.38)
-      tl.to(main.position, { x: 1.25, z: 0,  duration: 0.58, ease: 'back.out(2.2)' }, 0.38)
+      tl.to(main.position, { x: 1.85, z: 0,  duration: 0.58, ease: 'back.out(2.2)' }, 0.38)
     },
   }))
 
@@ -44,7 +44,7 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
     /* Section 0 — Hero: right-of-center, slow float */
     if (section === 0) {
       main.rotation.y += delta * 0.3
-      main.position.x  = THREE.MathUtils.lerp(main.position.x,  1.25, 0.055)
+      main.position.x  = THREE.MathUtils.lerp(main.position.x,  1.85, 0.055)
       main.position.y  = Math.sin(t * 0.7) * 0.1
       main.position.z  = THREE.MathUtils.lerp(main.position.z,  0,    0.05)
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x,   1,    0.05))
@@ -64,14 +64,14 @@ const CanScene = forwardRef(({ scrollState }, ref) => {
     if (section === 2) {
       main.rotation.y  = THREE.MathUtils.lerp(main.rotation.y, Math.PI, 0.046)
       main.rotation.z  = THREE.MathUtils.lerp(main.rotation.z, 0,       0.05)
-      main.position.x  = THREE.MathUtils.lerp(main.position.x, 1.1,    0.052)
+      main.position.x  = THREE.MathUtils.lerp(main.position.x, 1.75,   0.052)
       main.position.y  = THREE.MathUtils.lerp(main.position.y, 0,      0.05)
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1.38, 0.04))
     }
 
     /* Section 3 — CTA: center, pour tilt */
     if (section >= 3) {
-      main.position.x  = THREE.MathUtils.lerp(main.position.x, 0.3,   0.05)
+      main.position.x  = THREE.MathUtils.lerp(main.position.x, 1.6,   0.05)
       main.position.y  = THREE.MathUtils.lerp(main.position.y, 0.2,   0.05)
       main.rotation.x  = THREE.MathUtils.lerp(main.rotation.x, -0.42, 0.04)
       main.scale.setScalar(THREE.MathUtils.lerp(main.scale.x, 1.06, 0.04))

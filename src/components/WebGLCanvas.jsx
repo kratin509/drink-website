@@ -17,7 +17,7 @@ const WebGLCanvas = forwardRef(({ scrollState }, canvasRef) => {
         camera={{ position: [0, 0, 5.2], fov: 42 }}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
-        style={{ background: 'transparent' }}
+        style={{ background: 'transparent', pointerEvents: 'none' }}
         shadows
       >
         <Suspense fallback={null}>

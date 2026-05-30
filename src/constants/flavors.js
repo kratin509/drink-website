@@ -56,4 +56,23 @@ export const FLAVORS = [
       sodium: '60mg',
     },
   },
+  {
+    id: 'arctic-mint',
+    name: 'Arctic Mint',
+    tagline: 'Ice Cold Focus.',
+    accent: '#0891b2',
+    accentRgb: '8, 145, 178',
+    canColor: '#0c4a6e',
+    labelColor: '#0ea5e9',
+    bg: '#f0f9ff',
+    ingredients: ['Peppermint', 'L-Theanine', 'Zinc', 'Vitamin D'],
+    emoji: '🧊',
+    nutrition: {
+      calories: 145,
+      protein: '20g',
+      caffeine: '165mg',
+      sugar: '0g',
+      sodium: '55mg',
+    },
+  },
 ]
