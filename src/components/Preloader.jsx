@@ -1,112 +1,167 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 
-export default function Preloader({ onComplete }) {
-  const [progress, setProgress] = useState(0)
-  const wrapRef = useRef(null)
-  const logoRef = useRef(null)
-  const counterRef = useRef(null)
-  const barRef = useRef(null)
+export default function Preloader({ onBurstReady }) {
+  const [pct, setPct] = useState(0)
+  const wrapRef  = useRef()
+  const numRef   = useRef()
+  const barRef   = useRef()
+  const logoRef  = useRef()
+  const subtextRef = useRef()
+  const done = useRef(false)
 
   useEffect(() => {
-    let current = 0
-    const target = 100
-    const duration = 2200
-
+    const DURATION = 2000
     const start = performance.now()
 
     const tick = (now) => {
-      const elapsed = now - start
-      const t = Math.min(elapsed / duration, 1)
-      // ease-out cubic
-      const eased = 1 - Math.pow(1 - t, 3)
-      current = Math.floor(eased * target)
-      setProgress(current)
+      if (done.current) return
+      const elapsed = Math.min(now - start, DURATION)
+      const ease = 1 - Math.pow(1 - elapsed / DURATION, 3) // cubic ease-out
+      const value = Math.floor(ease * 100)
+      setPct(value)
 
-      if (t < 1) {
+      if (elapsed < DURATION) {
         requestAnimationFrame(tick)
       } else {
-        // Climax animation at 100%
-        const tl = gsap.timeline({ onComplete })
-        tl.to(logoRef.current, {
-          scale: 1.15,
-          skewX: -6,
-          duration: 0.15,
-          ease: 'power4.out',
+        done.current = true
+        // Slight hold at 100 before burst
+        gsap.delayedCall(0.25, () => {
+          // Logo glitch/shake before reveal
+          gsap
+            .timeline()
+            .to(logoRef.current, { skewX: 12, scaleX: 1.08, duration: 0.08, ease: 'power2.in' })
+            .to(logoRef.current, { skewX: -8, scaleX: 0.96, duration: 0.07 })
+            .to(logoRef.current, { skewX: 0, scaleX: 1,    duration: 0.06 })
+            .to(
+              wrapRef.current,
+              {
+                opacity: 0,
+                duration: 0.55,
+                ease: 'power2.in',
+                onStart: () => onBurstReady?.(), // fire 3D burst at same moment
+              },
+              0.3
+            )
+            .set(wrapRef.current, { display: 'none' })
         })
-          .to(logoRef.current, {
-            scale: 1,
-            skewX: 0,
-            duration: 0.1,
-          })
-          .to(logoRef.current, {
-            scale: 30,
-            opacity: 0,
-            duration: 0.7,
-            ease: 'expo.in',
-          }, '+=0.1')
-          .to(wrapRef.current, {
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power2.in',
-          }, '-=0.3')
       }
     }
-
     requestAnimationFrame(tick)
-  }, [onComplete])
+  }, [onBurstReady])
 
   return (
     <div
       ref={wrapRef}
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0a0a0a] overflow-hidden"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
+      style={{ background: '#080808' }}
     >
-      {/* Background grid */}
+      {/* Grid texture */}
       <div
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-[0.06]"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+            'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
         }}
       />
 
-      {/* Logo */}
-      <div ref={logoRef} className="relative mb-16 select-none">
-        <h1
-          className="font-display text-white text-[22vw] leading-none tracking-tighter"
-          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}
+      {/* Corner marks */}
+      {[
+        'top-6 left-6',
+        'top-6 right-6 rotate-90',
+        'bottom-6 left-6 -rotate-90',
+        'bottom-6 right-6 rotate-180',
+      ].map((pos, i) => (
+        <svg
+          key={i}
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          className={`absolute ${pos} opacity-30`}
+        >
+          <path d="M0 0 L12 0 L0 12 Z" fill="none" stroke="white" strokeWidth="1.5" />
+        </svg>
+      ))}
+
+      {/* Big NIRO logo */}
+      <div ref={logoRef} className="relative mb-8 select-none">
+        <span
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 900,
+            fontSize: 'clamp(8rem, 22vw, 22rem)',
+            lineHeight: 0.85,
+            letterSpacing: '-0.04em',
+            color: '#ffffff',
+            display: 'block',
+          }}
         >
           NIRO
-        </h1>
+        </span>
+        {/* Accent underline that grows with progress */}
         <div
-          className="absolute -bottom-1 left-0 right-0 h-1 bg-red-600"
-          style={{ transform: `scaleX(${progress / 100})`, transformOrigin: 'left', transition: 'transform 0.05s linear' }}
+          className="absolute -bottom-3 left-0 h-[3px] bg-red-600 origin-left"
+          style={{ width: `${pct}%`, transition: 'width 0.08s linear' }}
         />
       </div>
 
+      {/* Sub-label */}
+      <p
+        ref={subtextRef}
+        style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          fontSize: '0.7rem',
+          letterSpacing: '0.5em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.25)',
+          marginBottom: '3.5rem',
+        }}
+      >
+        Protein + Caffeine · Zero Compromise
+      </p>
+
       {/* Counter */}
       <div
-        ref={counterRef}
-        className="font-display text-white/40 text-[10vw] tabular-nums leading-none"
-        style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700 }}
+        ref={numRef}
+        style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 900,
+          fontSize: 'clamp(5rem, 14vw, 14rem)',
+          lineHeight: 0.88,
+          letterSpacing: '-0.04em',
+          color: 'rgba(255,255,255,0.08)',
+          userSelect: 'none',
+          tabularNums: true,
+        }}
       >
-        {String(progress).padStart(3, '0')}
-        <span className="text-[5vw] text-red-600 ml-1">%</span>
+        {String(pct).padStart(3, '0')}
+        <span style={{ fontSize: '0.38em', color: 'rgba(220,38,38,0.7)', marginLeft: '0.1em' }}>%</span>
       </div>
 
       {/* Progress bar */}
       <div className="absolute bottom-10 left-10 right-10">
-        <div ref={barRef} className="h-px bg-white/10 relative overflow-hidden">
+        <div className="relative h-px bg-white/10 overflow-hidden">
           <div
-            className="absolute inset-y-0 left-0 bg-red-600 transition-all"
-            style={{ width: `${progress}%`, transition: 'width 0.05s linear' }}
+            ref={barRef}
+            className="absolute inset-y-0 left-0 bg-red-600"
+            style={{ width: `${pct}%`, transition: 'width 0.08s linear' }}
           />
         </div>
-        <div className="flex justify-between mt-2 font-display text-white/30 text-xs tracking-widest uppercase"
-          style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>
+        <div
+          className="flex justify-between mt-2"
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: '0.65rem',
+            letterSpacing: '0.28em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.22)',
+          }}
+        >
           <span>Loading Experience</span>
-          <span>{progress}%</span>
+          <span>{pct}%</span>
         </div>
       </div>
     </div>

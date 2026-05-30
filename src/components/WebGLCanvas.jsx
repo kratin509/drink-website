@@ -1,23 +1,10 @@
-import { useRef, Suspense } from 'react'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Suspense, forwardRef } from 'react'
+import { Canvas } from '@react-three/fiber'
 import { Environment, ContactShadows } from '@react-three/drei'
-import CanMesh from './CanMesh'
-import FloatingIngredients from './FloatingIngredients'
-import LiquidPour from './LiquidPour'
+import CanScene from './CanScene'
 import { useFlavorStore } from '../store/flavorStore'
 
-function Rig({ scrollState }) {
-  const { camera } = useThree()
-  useRef(() => {
-    camera.fov = 45
-    camera.near = 0.1
-    camera.far = 100
-    camera.updateProjectionMatrix()
-  })
-  return null
-}
-
-export default function WebGLCanvas({ scrollState }) {
+const WebGLCanvas = forwardRef(({ scrollState }, canvasRef) => {
   const { activeFlavor } = useFlavorStore()
 
   return (
@@ -27,40 +14,49 @@ export default function WebGLCanvas({ scrollState }) {
       aria-hidden="true"
     >
       <Canvas
-        camera={{ position: [0, 0, 4.5], fov: 45 }}
+        camera={{ position: [0, 0, 5], fov: 42 }}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
-          {/* Lighting */}
-          <ambientLight intensity={0.6} />
+          <ambientLight intensity={0.55} />
           <directionalLight
-            position={[5, 8, 5]}
-            intensity={2}
+            position={[4, 8, 6]}
+            intensity={2.2}
             castShadow
             shadow-mapSize={[2048, 2048]}
           />
-          <pointLight position={[-3, -2, 3]} intensity={0.8} color={activeFlavor.accent} />
-          <pointLight position={[3, 3, -2]} intensity={0.5} color="#ffffff" />
-
-          <Environment preset="city" />
-
-          <ContactShadows
-            position={[0, -1.5, 0]}
-            opacity={0.4}
-            scale={5}
-            blur={2.5}
-            far={4}
+          <pointLight
+            position={[-4, -1, 3]}
+            intensity={1.1}
+            color={activeFlavor.accent}
+          />
+          <pointLight position={[4, 4, -2]} intensity={0.6} color="#ffffff" />
+          <spotLight
+            position={[0, 6, 4]}
+            angle={0.35}
+            penumbra={0.8}
+            intensity={1.4}
+            castShadow
           />
 
-          <CanMesh scrollState={scrollState} />
-          <FloatingIngredients active={scrollState.section === 1} />
-          <LiquidPour active={scrollState.section === 3} />
+          <Environment preset="studio" />
 
-          <Rig scrollState={scrollState} />
+          <ContactShadows
+            position={[0, -2.0, 0]}
+            opacity={0.35}
+            scale={8}
+            blur={3}
+            far={5}
+          />
+
+          <CanScene ref={canvasRef} scrollState={scrollState} />
         </Suspense>
       </Canvas>
     </div>
   )
-}
+})
+
+WebGLCanvas.displayName = 'WebGLCanvas'
+export default WebGLCanvas

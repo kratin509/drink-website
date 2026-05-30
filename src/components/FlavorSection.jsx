@@ -8,38 +8,44 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function FlavorSection() {
   const sectionRef = useRef()
-  const cardsRef = useRef([])
-  const headRef = useRef()
+  const bgWordRef  = useRef()
+  const headRef    = useRef()
+  const cardsRef   = useRef([])
+  const tickerRef  = useRef()
   const { activeFlavor, setFlavor } = useFlavorStore()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headRef.current,
+      // Bg word parallax: scrolls slower than page
+      gsap.to(bgWordRef.current, {
+        yPercent: -18,
+        ease: 'none',
+        scrollTrigger: { trigger: sectionRef.current, start: 'top bottom', end: 'bottom top', scrub: true },
+      })
+
+      gsap.fromTo(headRef.current,
         { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
-        }
+        { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 78%' } }
       )
-      gsap.fromTo(
-        cardsRef.current.filter(Boolean),
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.75,
-          stagger: 0.12,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: sectionRef.current, start: 'top 60%' },
-        }
+      gsap.fromTo(cardsRef.current.filter(Boolean),
+        { opacity: 0, y: 55 },
+        { opacity: 1, y: 0, duration: 0.75, stagger: 0.12, ease: 'power3.out',
+          scrollTrigger: { trigger: sectionRef.current, start: 'top 65%' } }
       )
     }, sectionRef)
     return () => ctx.revert()
   }, [])
+
+  const LABEL_STYLE = {
+    fontFamily: "'Barlow Condensed', sans-serif",
+    fontWeight: 700,
+    fontSize: '0.65rem',
+    letterSpacing: '0.22em',
+    textTransform: 'uppercase',
+    opacity: 0.4,
+    marginTop: '4px',
+  }
 
   return (
     <section
@@ -48,216 +54,172 @@ export default function FlavorSection() {
       className="relative py-28 overflow-hidden"
       style={{ background: '#f8f8f6' }}
     >
-      {/* Section label */}
-      <div className="px-8 md:px-16 lg:px-24 flex items-center gap-4 mb-12">
-        <div className="w-8 h-px" style={{ background: activeFlavor.accent }} />
+      {/* ── Viewport-filling bg word ─────────────────────────── */}
+      <div
+        ref={bgWordRef}
+        aria-hidden="true"
+        className="absolute inset-0 flex flex-col justify-center pointer-events-none select-none overflow-hidden"
+      >
         <span
-          className="text-xs tracking-[0.25em] uppercase"
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            opacity: 0.45,
+            fontWeight: 900,
+            fontSize: 'clamp(8rem, 22vw, 26rem)',
+            lineHeight: 0.82,
+            letterSpacing: '-0.04em',
+            color: '#0a0a0a',
+            opacity: 0.04,
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
           }}
         >
-          02 / Choose Your Weapon
+          FLAVOR
         </span>
       </div>
 
-      {/* Headline */}
-      <div ref={headRef} className="px-8 md:px-16 lg:px-24 mb-16">
-        <h2
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 900,
-            fontSize: 'clamp(3.5rem, 9vw, 9rem)',
-            lineHeight: 0.88,
-            letterSpacing: '-0.02em',
-            textTransform: 'uppercase',
-            color: '#0a0a0a',
-          }}
-        >
-          Pick Your
-        </h2>
-        <h2
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 900,
-            fontSize: 'clamp(3.5rem, 9vw, 9rem)',
-            lineHeight: 0.88,
-            letterSpacing: '-0.02em',
-            textTransform: 'uppercase',
-            color: activeFlavor.accent,
-            transition: 'color 0.4s',
-          }}
-        >
-          Flavor
-        </h2>
-      </div>
+      <div className="relative z-10 px-8 md:px-16 lg:px-24">
+        {/* Section label */}
+        <div className="flex items-center gap-4 mb-12">
+          <div className="h-px w-8" style={{ background: activeFlavor.accent, transition: 'background 0.4s' }} />
+          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.28em', textTransform: 'uppercase', opacity: 0.45 }}>
+            02 / Choose Your Weapon
+          </span>
+        </div>
 
-      {/* Flavor cards */}
-      <div className="px-8 md:px-16 lg:px-24 grid grid-cols-1 md:grid-cols-3 gap-5 mb-20">
-        {FLAVORS.map((flavor, i) => {
-          const isActive = activeFlavor.id === flavor.id
-          return (
-            <button
-              key={flavor.id}
-              ref={(el) => (cardsRef.current[i] = el)}
-              onClick={() => setFlavor(flavor)}
-              className="group text-left transition-all duration-300 cursor-pointer"
-              style={{
-                padding: '2rem',
-                border: `2px solid ${isActive ? flavor.accent : 'rgba(0,0,0,0.1)'}`,
-                background: isActive
-                  ? `rgba(${flavor.accentRgb}, 0.05)`
-                  : '#ffffff',
-                transform: isActive ? 'translateY(-6px)' : 'none',
-                boxShadow: isActive
-                  ? `0 20px 60px rgba(${flavor.accentRgb}, 0.15)`
-                  : '0 2px 8px rgba(0,0,0,0.04)',
-              }}
-            >
-              {/* Emoji */}
-              <div className="text-4xl mb-5">{flavor.emoji}</div>
+        {/* Headline block */}
+        <div ref={headRef} className="mb-16">
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 'clamp(4rem, 10vw, 11rem)', lineHeight: 0.85, letterSpacing: '-0.03em', textTransform: 'uppercase', color: '#0a0a0a' }}>
+            Pick Your
+          </h2>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 'clamp(4rem, 10vw, 11rem)', lineHeight: 0.85, letterSpacing: '-0.03em', textTransform: 'uppercase', color: activeFlavor.accent, transition: 'color 0.4s' }}>
+            Flavor
+          </h2>
+        </div>
 
-              {/* Name */}
-              <h3
-                className="mb-1 leading-none"
+        {/* Flavor cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+          {FLAVORS.map((fl, i) => {
+            const on = activeFlavor.id === fl.id
+            return (
+              <button
+                key={fl.id}
+                ref={el => (cardsRef.current[i] = el)}
+                onClick={() => setFlavor(fl)}
+                className="text-left transition-all duration-300 cursor-pointer"
                 style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontWeight: 900,
-                  fontSize: 'clamp(1.6rem, 2.5vw, 2.4rem)',
-                  textTransform: 'uppercase',
-                  color: isActive ? flavor.accent : '#0a0a0a',
-                  transition: 'color 0.3s',
+                  padding: '2rem 2rem 1.75rem',
+                  background: on ? '#ffffff' : '#ffffff',
+                  border: `2px solid ${on ? fl.accent : 'rgba(0,0,0,0.08)'}`,
+                  boxShadow: on
+                    ? `0 24px 64px rgba(${fl.accentRgb}, 0.18), 0 4px 16px rgba(0,0,0,0.06)`
+                    : '0 2px 8px rgba(0,0,0,0.04)',
+                  transform: on ? 'translateY(-8px)' : 'none',
                 }}
               >
-                {flavor.name}
-              </h3>
-
-              {/* Tagline */}
-              <p
-                className="mb-5"
-                style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  opacity: 0.4,
-                }}
-              >
-                {flavor.tagline}
-              </p>
-
-              {/* Ingredient tags */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {flavor.ingredients.map((ing) => (
-                  <span
-                    key={ing}
-                    style={{
+                {/* Top row: emoji + platform-style badge */}
+                <div className="flex justify-between items-start mb-6">
+                  <span style={{ fontSize: '2.4rem', lineHeight: 1 }}>{fl.emoji}</span>
+                  {on && (
+                    <span style={{
                       fontFamily: "'Barlow Condensed', sans-serif",
                       fontWeight: 700,
-                      fontSize: '0.7rem',
-                      letterSpacing: '0.12em',
+                      fontSize: '0.6rem',
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: fl.accent,
+                      background: `rgba(${fl.accentRgb}, 0.1)`,
+                      padding: '4px 8px',
+                    }}>Active</span>
+                  )}
+                </div>
+
+                {/* Name */}
+                <h3 style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 900,
+                  fontSize: 'clamp(1.5rem, 2.2vw, 2.2rem)',
+                  lineHeight: 0.9,
+                  textTransform: 'uppercase',
+                  color: on ? fl.accent : '#0a0a0a',
+                  marginBottom: '6px',
+                  transition: 'color 0.3s',
+                }}>
+                  {fl.name}
+                </h3>
+
+                {/* Tagline */}
+                <p style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  opacity: 0.38,
+                  marginBottom: '1.25rem',
+                }}>
+                  {fl.tagline}
+                </p>
+
+                {/* Ingredient chips */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {fl.ingredients.map(ing => (
+                    <span key={ing} style={{
+                      fontFamily: "'Barlow Condensed', sans-serif",
+                      fontWeight: 700,
+                      fontSize: '0.65rem',
+                      letterSpacing: '0.1em',
                       textTransform: 'uppercase',
                       padding: '3px 8px',
-                      background: `rgba(${flavor.accentRgb}, 0.1)`,
-                      color: flavor.accent,
-                    }}
-                  >
-                    {ing}
-                  </span>
-                ))}
-              </div>
-
-              {/* Macros */}
-              <div
-                className="flex gap-6 pt-5"
-                style={{ borderTop: `1px solid rgba(0,0,0,0.08)` }}
-              >
-                {[
-                  { val: flavor.nutrition.protein, label: 'Protein' },
-                  { val: flavor.nutrition.caffeine, label: 'Caffeine' },
-                  { val: flavor.nutrition.sugar, label: 'Sugar' },
-                ].map(({ val, label }) => (
-                  <div key={label}>
-                    <div
-                      style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
-                        fontWeight: 900,
-                        fontSize: '1.6rem',
-                        lineHeight: 1,
-                        color: flavor.accent,
-                      }}
-                    >
-                      {val}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.65rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.12em',
-                        opacity: 0.45,
-                        marginTop: '3px',
-                      }}
-                    >
-                      {label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Active indicator */}
-              {isActive && (
-                <div
-                  className="flex items-center gap-2 mt-5"
-                  style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 700,
-                    fontSize: '0.7rem',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    color: flavor.accent,
-                  }}
-                >
-                  <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: flavor.accent }}
-                  />
-                  Currently Viewing
+                      background: `rgba(${fl.accentRgb}, 0.09)`,
+                      color: fl.accent,
+                    }}>
+                      {ing}
+                    </span>
+                  ))}
                 </div>
-              )}
-            </button>
-          )
-        })}
+
+                {/* Macro row */}
+                <div className="flex gap-6 pt-5" style={{ borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+                  {[
+                    { val: fl.nutrition.protein,  label: 'Protein' },
+                    { val: fl.nutrition.caffeine, label: 'Caffeine' },
+                    { val: fl.nutrition.sugar,    label: 'Sugar' },
+                  ].map(({ val, label }) => (
+                    <div key={label}>
+                      <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 'clamp(1.4rem, 2vw, 1.8rem)', lineHeight: 1, color: fl.accent }}>
+                        {val}
+                      </div>
+                      <div style={LABEL_STYLE}>{label}</div>
+                    </div>
+                  ))}
+                </div>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Ticker tape */}
+      {/* Ticker tape — runs full bleed */}
       <div
-        className="overflow-hidden py-4"
-        style={{ borderTop: '1px solid rgba(0,0,0,0.08)', borderBottom: '1px solid rgba(0,0,0,0.08)' }}
+        className="overflow-hidden py-5"
+        style={{ borderTop: '1px solid rgba(0,0,0,0.07)', borderBottom: '1px solid rgba(0,0,0,0.07)' }}
       >
-        <div className="ticker-inner flex gap-16 whitespace-nowrap">
-          {[...Array(4)].flatMap((_, rep) =>
-            ['PROTEIN', 'CAFFEINE', 'ZERO SUGAR', 'RAW POWER', 'NIRO', 'PERFORMANCE'].map(
-              (word, i) => (
-                <span
-                  key={`${rep}-${word}`}
-                  style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 900,
-                    fontSize: 'clamp(1.5rem, 2.5vw, 2.5rem)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '-0.01em',
-                    color: i % 2 === 0 ? '#0a0a0a' : activeFlavor.accent,
-                    opacity: i % 2 === 0 ? 0.12 : 0.55,
-                    transition: 'color 0.4s',
-                  }}
-                >
-                  {word}
-                </span>
-              )
-            )
+        <div ref={tickerRef} className="ticker-inner flex gap-16 whitespace-nowrap">
+          {[...Array(4)].flatMap((_, r) =>
+            ['PROTEIN', 'CAFFEINE', 'ZERO SUGAR', 'RAW POWER', 'NIRO', '20G PROTEIN'].map((w, i) => (
+              <span key={`${r}-${i}`} style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 900,
+                fontSize: 'clamp(1.6rem, 2.8vw, 3rem)',
+                letterSpacing: '-0.01em',
+                textTransform: 'uppercase',
+                color: i % 2 === 0 ? '#0a0a0a' : activeFlavor.accent,
+                opacity: i % 2 === 0 ? 0.1 : 0.6,
+                transition: 'color 0.4s',
+              }}>
+                {w}
+              </span>
+            ))
           )}
         </div>
       </div>

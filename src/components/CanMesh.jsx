@@ -1,183 +1,129 @@
-import { useRef, useMemo } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useMemo } from 'react'
 import * as THREE from 'three'
-import { useFlavorStore } from '../store/flavorStore'
 
-export default function CanMesh({ scrollState }) {
-  const groupRef = useRef()
-  const topRef = useRef()
-  const bottomRef = useRef()
-  const bodyRef = useRef()
-  const labelRef = useRef()
-  const { activeFlavor } = useFlavorStore()
+export default function CanMesh({ flavorConfig, scale = 1 }) {
+  const { canColor, labelColor, name, tagline, accent, nutrition } = flavorConfig
 
-  const labelTexture = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 1024
-    canvas.height = 512
-    const ctx = canvas.getContext('2d')
+  const labelTex = useMemo(() => {
+    const W = 1024, H = 512
+    const cv = document.createElement('canvas')
+    cv.width = W; cv.height = H
+    const c = cv.getContext('2d')
 
-    // Base gradient
-    const grad = ctx.createLinearGradient(0, 0, 1024, 0)
-    grad.addColorStop(0, activeFlavor.canColor)
-    grad.addColorStop(0.5, activeFlavor.labelColor)
-    grad.addColorStop(1, activeFlavor.canColor)
-    ctx.fillStyle = grad
-    ctx.fillRect(0, 0, 1024, 512)
+    // Base radial gradient
+    const radial = c.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, W * 0.6)
+    radial.addColorStop(0, labelColor)
+    radial.addColorStop(1, canColor)
+    c.fillStyle = radial
+    c.fillRect(0, 0, W, H)
 
-    // Brand name
-    ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 160px "Arial Narrow", Arial'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('NIRO', 512, 180)
+    // Subtle vertical shine stripe
+    const shine = c.createLinearGradient(W * 0.3, 0, W * 0.7, 0)
+    shine.addColorStop(0, 'rgba(255,255,255,0)')
+    shine.addColorStop(0.5, 'rgba(255,255,255,0.12)')
+    shine.addColorStop(1, 'rgba(255,255,255,0)')
+    c.fillStyle = shine
+    c.fillRect(0, 0, W, H)
 
-    // Flavor name
-    ctx.font = 'bold 52px Arial'
-    ctx.fillStyle = 'rgba(255,255,255,0.85)'
-    ctx.fillText(activeFlavor.name.toUpperCase(), 512, 280)
-
-    // Tagline
-    ctx.font = '36px Arial'
-    ctx.fillStyle = 'rgba(255,255,255,0.55)'
-    ctx.fillText(activeFlavor.tagline.toUpperCase(), 512, 340)
-
-    // Macro strip
-    ctx.fillStyle = 'rgba(0,0,0,0.3)'
-    ctx.fillRect(0, 400, 1024, 80)
-    ctx.fillStyle = 'rgba(255,255,255,0.9)'
-    ctx.font = 'bold 36px Arial'
-    ctx.fillText('20G PROTEIN · 150MG CAFFEINE · ZERO SUGAR', 512, 445)
-
-    // Decorative lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)'
-    ctx.lineWidth = 2
-    for (let x = 0; x < 1024; x += 40) {
-      ctx.beginPath()
-      ctx.moveTo(x, 0)
-      ctx.lineTo(x, 512)
-      ctx.stroke()
+    // Thin horizontal rule lines
+    c.strokeStyle = 'rgba(255,255,255,0.07)'
+    c.lineWidth = 1
+    for (let y = 0; y < H; y += 18) {
+      c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke()
     }
 
-    const texture = new THREE.CanvasTexture(canvas)
-    texture.wrapS = THREE.RepeatWrapping
-    texture.anisotropy = 16
-    return texture
-  }, [activeFlavor])
+    // Brand name
+    c.save()
+    c.shadowColor = 'rgba(0,0,0,0.6)'
+    c.shadowBlur = 18
+    c.fillStyle = '#fff'
+    c.font = `900 200px "Arial Narrow",Arial`
+    c.textAlign = 'center'
+    c.textBaseline = 'middle'
+    c.fillText('NIRO', W * 0.5, H * 0.32)
+    c.restore()
 
-  // Metal cap material
+    // Flavor name
+    c.fillStyle = 'rgba(255,255,255,0.88)'
+    c.font = `700 58px Arial`
+    c.fillText(name.toUpperCase(), W * 0.5, H * 0.58)
+
+    // Tagline
+    c.fillStyle = 'rgba(255,255,255,0.5)'
+    c.font = `400 36px Arial`
+    c.fillText(tagline.toUpperCase(), W * 0.5, H * 0.70)
+
+    // Macro strip
+    c.fillStyle = 'rgba(0,0,0,0.35)'
+    c.fillRect(0, H * 0.82, W, H * 0.18)
+    c.fillStyle = 'rgba(255,255,255,0.92)'
+    c.font = `700 32px Arial`
+    const macroStr = `${nutrition?.protein ?? '20g'} PROTEIN · ${nutrition?.caffeine ?? '150mg'} CAFFEINE`
+    c.fillText(macroStr, W * 0.5, H * 0.92)
+
+    // Accent top band
+    c.fillStyle = accent
+    c.fillRect(0, 0, W, 8)
+    c.fillRect(0, H - 8, W, 8)
+
+    const tex = new THREE.CanvasTexture(cv)
+    tex.wrapS = THREE.RepeatWrapping
+    tex.anisotropy = 16
+    return tex
+  }, [flavorConfig])
+
   const metalMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#c0c0c0'),
-        metalness: 0.9,
-        roughness: 0.2,
-        envMapIntensity: 1.2,
+        color: new THREE.Color('#d0d0d0'),
+        metalness: 0.92,
+        roughness: 0.18,
+        envMapIntensity: 1.4,
       }),
     []
   )
 
-  useFrame((state, delta) => {
-    if (!groupRef.current) return
-    const { section, progress } = scrollState
-
-    // Hero: sit right-of-center, gentle float + slow spin
-    if (section === 0) {
-      groupRef.current.rotation.y += delta * 0.35
-      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.8) * 0.1
-      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, 1.4, 0.04)
-    }
-
-    // Flavors: sweep left→right across screen with full spin
-    if (section === 1) {
-      const p = progress
-      groupRef.current.position.x = THREE.MathUtils.lerp(
-        groupRef.current.position.x,
-        (p - 0.5) * 3.0,
-        0.06
-      )
-      groupRef.current.rotation.y += delta * 2.5
-      groupRef.current.rotation.z = THREE.MathUtils.lerp(
-        groupRef.current.rotation.z,
-        Math.sin(p * Math.PI) * 0.25,
-        0.05
-      )
-      groupRef.current.position.y = THREE.MathUtils.lerp(
-        groupRef.current.position.y,
-        Math.sin(p * Math.PI) * 0.35,
-        0.05
-      )
-    }
-
-    // Nutrition: shift right, spin to back, gentle zoom
-    if (section === 2) {
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(
-        groupRef.current.rotation.y,
-        Math.PI * 1.0,
-        0.04
-      )
-      groupRef.current.position.x = THREE.MathUtils.lerp(
-        groupRef.current.position.x,
-        1.1,
-        0.05
-      )
-      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, 0, 0.05)
-      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1.35, 0.04))
-    }
-
-    // CTA: center, tilt toward user, pour
-    if (section === 3) {
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -0.45, 0.04)
-      groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, 0, 0.04)
-      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, 0.4, 0.04)
-      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1.05, 0.04))
-    }
-
-    if (section !== 2 && section !== 3) {
-      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, 1, 0.04))
-    }
-    if (section !== 3) {
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, 0.04)
-    }
-  })
+  const s = scale
 
   return (
-    <group ref={groupRef}>
-      {/* Can body */}
-      <mesh ref={bodyRef} castShadow>
-        <cylinderGeometry args={[0.42, 0.42, 1.4, 64, 1, true]} />
+    <group scale={[s, s, s]}>
+      {/* Body */}
+      <mesh castShadow>
+        <cylinderGeometry args={[0.42, 0.42, 1.45, 72, 1, true]} />
         <meshStandardMaterial
-          map={labelTexture}
-          metalness={0.6}
-          roughness={0.25}
-          envMapIntensity={1}
-          side={THREE.FrontSide}
+          map={labelTex}
+          metalness={0.55}
+          roughness={0.22}
+          envMapIntensity={1.1}
         />
       </mesh>
-
-      {/* Top cap */}
-      <mesh ref={topRef} position={[0, 0.7, 0]} castShadow material={metalMat}>
-        <cylinderGeometry args={[0.38, 0.42, 0.08, 64]} />
+      {/* Top shoulder taper */}
+      <mesh position={[0, 0.72, 0]} material={metalMat}>
+        <cylinderGeometry args={[0.34, 0.42, 0.1, 72]} />
       </mesh>
-
       {/* Top dome */}
-      <mesh position={[0, 0.75, 0]} material={metalMat}>
-        <sphereGeometry args={[0.38, 64, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      <mesh position={[0, 0.79, 0]} material={metalMat}>
+        <sphereGeometry args={[0.34, 72, 18, 0, Math.PI * 2, 0, Math.PI / 2.2]} />
       </mesh>
-
-      {/* Pull tab */}
-      <mesh position={[0, 0.82, 0.2]} rotation={[0.4, 0, 0]} material={metalMat}>
-        <torusGeometry args={[0.07, 0.018, 8, 20, Math.PI]} />
+      {/* Lid rim */}
+      <mesh position={[0, 0.815, 0]} material={metalMat}>
+        <torusGeometry args={[0.34, 0.018, 8, 72]} />
       </mesh>
-
-      {/* Bottom cap */}
-      <mesh ref={bottomRef} position={[0, -0.7, 0]} material={metalMat}>
-        <cylinderGeometry args={[0.42, 0.38, 0.08, 64]} />
+      {/* Pull tab body */}
+      <mesh position={[0, 0.845, 0.22]} rotation={[0.35, 0, 0]} material={metalMat}>
+        <boxGeometry args={[0.08, 0.024, 0.12]} />
       </mesh>
-
-      {/* Bottom indent */}
-      <mesh position={[0, -0.76, 0]} material={metalMat} rotation={[Math.PI, 0, 0]}>
-        <sphereGeometry args={[0.38, 64, 16, 0, Math.PI * 2, 0, Math.PI / 4]} />
+      {/* Pull tab ring */}
+      <mesh position={[0, 0.858, 0.275]} rotation={[Math.PI / 2, 0, 0]} material={metalMat}>
+        <torusGeometry args={[0.032, 0.011, 8, 20]} />
+      </mesh>
+      {/* Bottom shoulder */}
+      <mesh position={[0, -0.72, 0]} material={metalMat}>
+        <cylinderGeometry args={[0.42, 0.36, 0.1, 72]} />
+      </mesh>
+      {/* Bottom dome (inverted) */}
+      <mesh position={[0, -0.785, 0]} rotation={[Math.PI, 0, 0]} material={metalMat}>
+        <sphereGeometry args={[0.34, 72, 18, 0, Math.PI * 2, 0, Math.PI / 3]} />
       </mesh>
     </group>
   )
