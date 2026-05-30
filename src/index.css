@@ -34,21 +34,12 @@ body {
   display: block;
 }
 
-/* ── Z-index blueprint (utility classes) ──────────────────────────────── */
-/* z-0  → page background                                                   */
-/* z-10 → bg typography canvas layer (absolute within section)             */
-/* z-20 → UI blocks: cards, copy, buttons                                   */
-/* z-40 → WebGL canvas (fixed, pointer-events: none)                       */
-/* z-50 → Navbar                                                             */
-/* z-[9999] → Preloader overlay                                              */
-
-/* ── Section constraint — all main sections are full-viewport locked ─── */
-.section-frame {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-}
+/* ── Z-index blueprint ────────────────────────────────────────────────── */
+/* z-0  → fixed WebGL canvas (background layer, pointer-events: none)     */
+/* z-10 → scrolling DOM content wrapper                                    */
+/*        within sections: z-0 = decorative bg word, z-10 = UI content    */
+/* z-50 → Navbar                                                            */
+/* z-[9999] → Preloader overlay                                             */
 
 /* ── Typography system ──────────────────────────────────────────────────── */
 .vp-word {
