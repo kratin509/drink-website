@@ -31,12 +31,12 @@ export default function Navbar() {
         borderBottom: '1px solid rgba(0,0,0,0.07)',
       }}
     >
-      <div className="flex items-center justify-between" style={{ padding: isMobile ? '10px 16px' : '18px 40px' }}>
+      <div className="flex items-center justify-between" style={{ padding: isMobile ? '10px 16px' : '12px 40px' }}>
         {/* Wordmark */}
         <a href="#hero" style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 900, fontStyle: 'italic',
-          fontSize: isMobile ? '1.9rem' : '2rem',
+          fontSize: isMobile ? '1.9rem' : '8rem',
           letterSpacing: '-0.02em',
           textDecoration: 'none', color: '#0a0a0a', lineHeight: 1,
         }}>
