@@ -12,6 +12,7 @@ import FooterSection      from './components/FooterSection'
 import WebGLCanvas        from './components/WebGLCanvas'
 import { useLenis }       from './hooks/useLenis'
 import { useFlavorStore } from './store/flavorStore'
+import { useMobile }      from './hooks/useMobile'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -75,15 +76,21 @@ export default function App() {
   const [phase, setPhase]             = useState('loading')
   const [scrollState, setScrollState] = useState({ section: 0, progress: 0, raw: 0 })
   const sceneRef = useRef(null)
+  const isMobile = useMobile()
 
   const handleBurstReady = () => {
+    if (isMobile) {
+      // Skip WebGL burst on mobile — go straight to content
+      setPhase('ready')
+      return
+    }
     sceneRef.current?.triggerBurst(() => setPhase('ready'))
   }
 
   return (
     <>
-      {/* Fixed 3D canvas — z-[40], floats above all section content */}
-      <WebGLCanvas ref={sceneRef} scrollState={scrollState} />
+      {/* Fixed 3D canvas — desktop only */}
+      {!isMobile && <WebGLCanvas ref={sceneRef} scrollState={scrollState} />}
 
       {phase === 'loading' && <Preloader onBurstReady={handleBurstReady} />}
 
