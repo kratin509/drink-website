@@ -36,7 +36,7 @@ export default function Navbar() {
         <a href="#hero" style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 900, fontStyle: 'italic',
-          fontSize: isMobile ? '1.9rem' : '1.55rem',
+          fontSize: isMobile ? '1.9rem' : '2rem',
           letterSpacing: '-0.02em',
           textDecoration: 'none', color: '#0a0a0a', lineHeight: 1,
         }}>
