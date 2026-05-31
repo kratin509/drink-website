@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useFlavorStore } from '../store/flavorStore'
+import { useMobile } from '../hooks/useMobile'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -13,6 +14,7 @@ export default function FooterSection() {
   const [email, setEmail]         = useState('')
   const [submitted, setSubmitted] = useState(false)
   const { activeFlavor } = useFlavorStore()
+  const isMobile = useMobile()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -24,13 +26,13 @@ export default function FooterSection() {
         opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
         scrollTrigger: { trigger: sectionRef.current, start: 'top 74%' },
       })
-      gsap.fromTo(rightRef.current, { opacity: 0, x: 44 }, {
-        opacity: 1, x: 0, duration: 0.9, ease: 'power3.out',
+      gsap.fromTo(rightRef.current, { opacity: 0, x: isMobile ? 0 : 44, y: isMobile ? 20 : 0 }, {
+        opacity: 1, x: 0, y: 0, duration: 0.9, ease: 'power3.out',
         scrollTrigger: { trigger: sectionRef.current, start: 'top 74%' },
       })
     }, sectionRef)
     return () => ctx.revert()
-  }, [])
+  }, [isMobile])
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -46,14 +48,20 @@ export default function FooterSection() {
       {/* Ghost word */}
       <div ref={bgRef} aria-hidden="true"
         className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden pointer-events-none select-none">
-        <span className="vp-word text-[#0a0a0a]" style={{ fontSize: 'clamp(9rem, 26vw, 34rem)', opacity: 0.028 }}>
+        <span className="vp-word text-[#0a0a0a]" style={{ fontSize: isMobile ? 'clamp(6rem, 30vw, 14rem)' : 'clamp(9rem, 26vw, 34rem)', opacity: 0.028 }}>
           PUSH
         </span>
       </div>
 
       {/* UI */}
       <div className="absolute inset-0 z-20 flex flex-col justify-center"
-        style={{ paddingLeft: '8vw', paddingRight: '8vw', paddingTop: '80px', paddingBottom: '0' }}>
+        style={{
+          paddingLeft:  isMobile ? '5vw' : '8vw',
+          paddingRight: isMobile ? '5vw' : '8vw',
+          paddingTop:   isMobile ? '90px' : '80px',
+          paddingBottom: isMobile ? '100px' : '0',
+          overflowY: isMobile ? 'auto' : 'visible',
+        }}>
 
         {/* Eyebrow */}
         <div className="flex items-center gap-3 mb-8">
@@ -61,23 +69,29 @@ export default function FooterSection() {
           <span className="eyebrow" style={{ opacity: 0.45 }}>05 &nbsp;/&nbsp; Ready?</span>
         </div>
 
-        {/* Two columns */}
-        <div className="flex items-start gap-20" style={{ maxWidth: '78vw' }}>
+        {/* Two columns on desktop, stacked on mobile */}
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: 'flex-start',
+          gap: isMobile ? '36px' : '80px',
+          maxWidth: isMobile ? '100%' : '78vw',
+        }}>
 
           {/* Left — big typographic statement */}
-          <div ref={leftRef} style={{ flexShrink: 0, maxWidth: '36vw' }}>
-            <h2 className="display text-[#0a0a0a]" style={{ fontSize: 'clamp(3.5rem, 7.5vw, 9rem)', marginBottom: '0.06em' }}>
+          <div ref={leftRef} style={{ flexShrink: 0, maxWidth: isMobile ? '100%' : '36vw' }}>
+            <h2 className="display text-[#0a0a0a]" style={{ fontSize: isMobile ? 'clamp(3rem, 12vw, 5rem)' : 'clamp(3.5rem, 7.5vw, 9rem)', marginBottom: '0.06em' }}>
               Ready to
             </h2>
             <h2 className="display" style={{
-              fontSize: 'clamp(3.5rem, 7.5vw, 9rem)',
+              fontSize: isMobile ? 'clamp(3rem, 12vw, 5rem)' : 'clamp(3.5rem, 7.5vw, 9rem)',
               color: activeFlavor.accent, transition: 'color 0.4s',
               marginBottom: '1.4rem',
             }}>
               Push?
             </h2>
 
-            <div style={{ width: '48px', height: '3px', background: activeFlavor.accent, transition: 'background 0.4s', marginBottom: '1.6rem' }} />
+            <div style={{ width: '48px', height: '3px', background: activeFlavor.accent, transition: 'background 0.4s', marginBottom: '1.4rem' }} />
 
             <ul className="flex flex-col gap-4">
               {[
@@ -97,7 +111,7 @@ export default function FooterSection() {
           </div>
 
           {/* Right — email form */}
-          <div ref={rightRef} className="flex flex-col gap-6" style={{ maxWidth: '360px', flex: '1' }}>
+          <div ref={rightRef} className="flex flex-col gap-6" style={{ width: isMobile ? '100%' : undefined, maxWidth: isMobile ? '100%' : '360px', flex: isMobile ? 'none' : '1' }}>
             <div>
               <p style={{
                 fontFamily: "'Barlow',sans-serif", fontWeight: 300,
@@ -127,12 +141,13 @@ export default function FooterSection() {
                     border: '1.5px solid rgba(0,0,0,0.14)',
                     background: '#fff',
                     transition: 'border-color 0.2s',
+                    width: '100%',
                   }}
                   onFocus={e => (e.target.style.borderColor = activeFlavor.accent)}
                   onBlur={e  => (e.target.style.borderColor = 'rgba(0,0,0,0.14)')}
                 />
                 <button type="submit" className="btn-accent"
-                  style={{ background: activeFlavor.accent, borderColor: activeFlavor.accent, transition: 'background 0.4s, border-color 0.4s', textAlign: 'center' }}>
+                  style={{ background: activeFlavor.accent, borderColor: activeFlavor.accent, transition: 'background 0.4s, border-color 0.4s', textAlign: 'center', width: '100%' }}>
                   Claim 20% Off →
                 </button>
                 <p style={{ fontSize: '0.66rem', opacity: 0.26, fontFamily: "'Barlow',sans-serif" }}>
@@ -141,7 +156,7 @@ export default function FooterSection() {
               </form>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-3" style={{ flexWrap: 'wrap' }}>
               <a href="#flavors" className="btn-accent"
                 style={{ background: activeFlavor.accent, borderColor: activeFlavor.accent, transition: 'background 0.4s, border-color 0.4s', fontSize: '0.74rem', padding: '11px 22px' }}>
                 Shop Flavors
@@ -154,12 +169,20 @@ export default function FooterSection() {
         </div>
 
         {/* Bottom bar */}
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between"
-          style={{ padding: '16px 8vw', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
-          <div className="headline" style={{ fontSize: '1.3rem' }}>
+        <div className="absolute bottom-0 left-0 right-0"
+          style={{
+            padding: isMobile ? '14px 5vw' : '16px 8vw',
+            borderTop: '1px solid rgba(0,0,0,0.08)',
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            justifyContent: 'space-between',
+            gap: isMobile ? '10px' : '0',
+          }}>
+          <div className="headline" style={{ fontSize: '1.1rem' }}>
             NIRO<span style={{ color: activeFlavor.accent, transition: 'color 0.4s' }}>.</span>
           </div>
-          <div className="flex gap-7">
+          <div className="flex gap-5" style={{ flexWrap: 'wrap' }}>
             {['Instagram', 'Twitter', 'TikTok', 'YouTube'].map(s => (
               <a key={s} href="#" className="eyebrow"
                 style={{ fontSize: '0.62rem', opacity: 0.3, textDecoration: 'none', color: '#0a0a0a', transition: 'opacity 0.2s' }}
@@ -169,9 +192,11 @@ export default function FooterSection() {
               </a>
             ))}
           </div>
-          <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: '0.65rem', opacity: 0.22 }}>
-            © 2025 Niro Beverages. All rights reserved.
-          </p>
+          {!isMobile && (
+            <p style={{ fontFamily: "'Barlow',sans-serif", fontSize: '0.65rem', opacity: 0.22 }}>
+              © 2025 Niro Beverages. All rights reserved.
+            </p>
+          )}
         </div>
       </div>
     </section>

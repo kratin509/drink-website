@@ -19,10 +19,17 @@ body   { font-family: 'Barlow', sans-serif; background: var(--page-bg); color: v
 
 /* ─── Section frame: every section is an exact viewport cell ───────────────── */
 .section-frame {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
   overflow: hidden;
   position: relative;
+}
+
+@media (max-width: 767px) {
+  .section-frame { height: auto; min-height: 100svh; }
+  .webgl-layer { display: none; }
+  .ticker-track { animation-duration: 16s; }
+  .btn-accent, .btn-ghost, .btn-primary { padding: 11px 20px; font-size: 0.78rem; }
 }
 
 /* ─── Z-index layers ────────────────────────────────────────────────────────── */

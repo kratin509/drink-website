@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useFlavorStore } from '../store/flavorStore'
+import { useMobile } from '../hooks/useMobile'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -67,6 +68,7 @@ export default function SocialProofSection() {
   const gridRef    = useRef()
   const statsRef   = useRef()
   const { activeFlavor } = useFlavorStore()
+  const isMobile = useMobile()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -118,7 +120,13 @@ export default function SocialProofSection() {
 
       {/* UI */}
       <div className="absolute inset-0 z-20 flex flex-col"
-        style={{ paddingLeft: '8vw', paddingRight: '8vw', paddingTop: '80px', paddingBottom: '32px' }}>
+        style={{
+          paddingLeft:  isMobile ? '5vw' : '8vw',
+          paddingRight: isMobile ? '5vw' : '8vw',
+          paddingTop:   isMobile ? '90px' : '80px',
+          paddingBottom: '32px',
+          overflowY: isMobile ? 'auto' : 'visible',
+        }}>
 
         {/* Eyebrow */}
         <div className="flex items-center gap-3 mb-4">
@@ -130,8 +138,8 @@ export default function SocialProofSection() {
 
         {/* Heading */}
         <div ref={headRef} className="mb-5">
-          <h2 className="headline text-white" style={{ fontSize: 'clamp(2.8rem, 7vw, 8rem)' }}>The Niro</h2>
-          <h2 className="headline mb-2" style={{ fontSize: 'clamp(2.8rem, 7vw, 8rem)', color: activeFlavor.accent, transition: 'color 0.4s' }}>
+          <h2 className="headline text-white" style={{ fontSize: isMobile ? 'clamp(2rem, 9vw, 3.5rem)' : 'clamp(2.8rem, 7vw, 8rem)' }}>The Niro</h2>
+          <h2 className="headline mb-2" style={{ fontSize: isMobile ? 'clamp(2rem, 9vw, 3.5rem)' : 'clamp(2.8rem, 7vw, 8rem)', color: activeFlavor.accent, transition: 'color 0.4s' }}>
             Effect
           </h2>
           <p style={{ fontFamily: "'Barlow',sans-serif", fontWeight: 300, fontSize: '0.9rem', color: 'rgba(255,255,255,0.32)', maxWidth: '34ch' }}>
@@ -139,8 +147,15 @@ export default function SocialProofSection() {
           </p>
         </div>
 
-        {/* 3-column card grid */}
-        <div ref={gridRef} className="grid grid-cols-3 gap-3 flex-1 min-h-0 content-start mb-5">
+        {/* Card grid — 3 col desktop, 1 col mobile */}
+        <div ref={gridRef} style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gap: '10px',
+          flex: isMobile ? 'none' : '1',
+          minHeight: 0,
+          marginBottom: '20px',
+        }}>
           {CARDS.map(d => <Card key={d.h} d={d} />)}
         </div>
 

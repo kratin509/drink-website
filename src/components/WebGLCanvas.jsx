@@ -9,7 +9,7 @@ const WebGLCanvas = forwardRef(({ scrollState }, canvasRef) => {
 
   return (
     <div
-      className="fixed inset-0 z-[40]"
+      className="fixed inset-0 z-[40] webgl-layer"
       style={{ pointerEvents: 'none' }}
       aria-hidden="true"
     >

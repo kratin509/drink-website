@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useFlavorStore } from '../store/flavorStore'
+import { useMobile } from '../hooks/useMobile'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -18,6 +19,7 @@ export default function NutritionSection() {
   const panelRef   = useRef()
   const nutsRef    = useRef()
   const { activeFlavor } = useFlavorStore()
+  const isMobile = useMobile()
   const n = activeFlavor.nutrition
 
   useEffect(() => {
@@ -43,12 +45,12 @@ export default function NutritionSection() {
   return (
     <section id="nutrition" ref={sectionRef} className="section-frame" style={{ background: 'var(--page-bg)' }}>
 
-      {/* Ghost word — right-anchored */}
+      {/* Ghost word */}
       <div ref={bgRef} aria-hidden="true"
         className="absolute inset-0 z-10 flex items-center justify-end overflow-hidden pointer-events-none select-none"
         style={{ paddingRight: '3vw' }}>
         <span className="vp-word" style={{
-          fontSize: 'clamp(6rem, 18vw, 24rem)',
+          fontSize: isMobile ? 'clamp(4rem, 20vw, 10rem)' : 'clamp(6rem, 18vw, 24rem)',
           color: `rgba(${activeFlavor.accentRgb}, 0.07)`,
           transition: 'color 0.5s',
         }}>FACTS</span>
@@ -56,7 +58,13 @@ export default function NutritionSection() {
 
       {/* UI */}
       <div className="absolute inset-0 z-20 flex flex-col justify-center"
-        style={{ paddingLeft: '8vw', paddingRight: '8vw', paddingTop: '80px' }}>
+        style={{
+          paddingLeft:  isMobile ? '5vw' : '8vw',
+          paddingRight: isMobile ? '5vw' : '8vw',
+          paddingTop:   isMobile ? '90px' : '80px',
+          paddingBottom: isMobile ? '40px' : '0',
+          overflowY: isMobile ? 'auto' : 'visible',
+        }}>
 
         {/* Eyebrow */}
         <div className="flex items-center gap-3 mb-6">
@@ -64,19 +72,24 @@ export default function NutritionSection() {
           <span className="eyebrow" style={{ opacity: 0.45 }}>03 &nbsp;/&nbsp; What's Inside</span>
         </div>
 
-        {/* Two-column: panel + callouts */}
-        <div className="flex items-start gap-14" style={{ maxWidth: '68vw' }}>
+        {/* Layout: side-by-side on desktop, stacked on mobile */}
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: 'flex-start',
+          gap: isMobile ? '28px' : '56px',
+          maxWidth: isMobile ? '100%' : '68vw',
+        }}>
 
-          {/* Left: headline + FDA panel */}
-          <div ref={panelRef} style={{ flexShrink: 0 }}>
-            <h2 className="headline mb-6" style={{ fontSize: 'clamp(2.8rem, 5.5vw, 6.5rem)' }}>
+          {/* FDA panel */}
+          <div ref={panelRef} style={{ flexShrink: 0, width: isMobile ? '100%' : 'auto' }}>
+            <h2 className="headline mb-4" style={{ fontSize: isMobile ? 'clamp(2rem, 8vw, 3rem)' : 'clamp(2.8rem, 5.5vw, 6.5rem)' }}>
               <span style={{ color: '#0a0a0a' }}>Nutrition</span>
               <br />
               <span style={{ color: activeFlavor.accent, transition: 'color 0.4s' }}>Facts</span>
             </h2>
 
-            {/* FDA panel */}
-            <div style={{ border: '3px solid #0a0a0a', padding: '14px 18px', background: '#fff', width: '310px' }}>
+            <div style={{ border: '3px solid #0a0a0a', padding: '14px 18px', background: '#fff', width: isMobile ? '100%' : '310px', maxWidth: '100%' }}>
               <div style={{ borderBottom: '8px solid #0a0a0a', paddingBottom: '5px', marginBottom: '6px' }}>
                 <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '1.85rem', lineHeight: 1 }}>
                   Nutrition Facts
@@ -110,20 +123,27 @@ export default function NutritionSection() {
             </p>
           </div>
 
-          {/* Right: big callout numbers — single vertical column */}
-          <div ref={nutsRef} className="flex flex-col gap-3" style={{ width: '220px', flexShrink: 0 }}>
+          {/* Callout numbers — vertical column */}
+          <div ref={nutsRef} style={{
+            display: isMobile ? 'grid' : 'flex',
+            gridTemplateColumns: isMobile ? '1fr 1fr' : undefined,
+            flexDirection: isMobile ? undefined : 'column',
+            gap: '12px',
+            width: isMobile ? '100%' : '220px',
+            flexShrink: 0,
+          }}>
             {CALLOUTS.map(c => (
               <div key={c.key} className="flex items-stretch gap-4"
-                style={{ padding: '18px 20px', background: '#fff', border: '1px solid rgba(0,0,0,0.07)' }}>
-                <div style={{ width: '2px', flexShrink: 0, alignSelf: 'stretch', background: activeFlavor.accent, transition: 'background 0.4s', minHeight: '36px' }} />
+                style={{ padding: '14px 16px', background: '#fff', border: '1px solid rgba(0,0,0,0.07)' }}>
+                <div style={{ width: '2px', flexShrink: 0, alignSelf: 'stretch', background: activeFlavor.accent, transition: 'background 0.4s', minHeight: '32px' }} />
                 <div>
                   <div className="headline" style={{
-                    fontSize: 'clamp(2rem, 3.2vw, 3.6rem)',
+                    fontSize: isMobile ? 'clamp(1.4rem, 5vw, 2rem)' : 'clamp(2rem, 3.2vw, 3.6rem)',
                     color: activeFlavor.accent, transition: 'color 0.4s',
                   }}>
                     {n[c.key]}
                   </div>
-                  <div className="eyebrow" style={{ opacity: 0.36, marginTop: '5px', fontSize: '0.58rem' }}>
+                  <div className="eyebrow" style={{ opacity: 0.36, marginTop: '4px', fontSize: '0.55rem' }}>
                     {c.label}
                   </div>
                 </div>
